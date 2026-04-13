@@ -1,6 +1,9 @@
 package dev.jasonhk.hkiit.itp4511.clinicman.mixin;
 
+import java.io.IOException;
+
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import dev.jasonhk.hkiit.itp4511.clinicman.bean.User;
 
@@ -23,5 +26,13 @@ public interface WithUser
         {
             session.setAttribute("user", user);
         }
+    }
+
+    default boolean ensureLoggedIn(HttpServletRequest request, HttpServletResponse response) throws IOException
+    {
+        if (getCurrentUser(request) != null) { return true; }
+
+        response.sendRedirect("/login");
+        return false;
     }
 }
