@@ -1,39 +1,91 @@
 package dev.jasonhk.hkiit.itp4511.clinicman.bean;
 
-public enum Clinic
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Time;
+
+public class Clinic
 {
-    CHAI_WAN(1, "Chai Wan"),
-    TSEUNG_KWAN_O(2, "Tseung Kwan O"),
-    SHA_TIN(3, "Sha Tin"),
-    TUEN_MUN(4, "Tuen Mun"),
-    TSING_YI(5, "Tsing Yi");
+    private int id;
+    private String location;
+    private Time openingTime;
+    private Time closingTime;
+    private boolean walkinEnabled;
 
-    private final int id;
-    private final String name;
+    public Clinic(String location, Time openingTime, Time closingTime, boolean walkinEnabled)
+    {
+        this.location = location;
+        this.openingTime = openingTime;
+        this.closingTime = closingTime;
+        this.walkinEnabled = walkinEnabled;
+    }
 
-    Clinic(int id, String name)
+    public Clinic(int id, String location, Time openingTime, Time closingTime, boolean walkinEnabled)
     {
         this.id = id;
-        this.name = name;
+        this.location = location;
+        this.openingTime = openingTime;
+        this.closingTime = closingTime;
+        this.walkinEnabled = walkinEnabled;
     }
 
-    public static Clinic findById(int id)
+    public int getId()
     {
-        for (Clinic clinic : Clinic.values())
-        {
-            if (clinic.id == id) { return clinic; }
-        }
-
-        throw new IllegalArgumentException(String.format("Clinic #%d does not exist.", id));
+        return id;
     }
 
-    public static Clinic findByName(String name)
+    public void setId(int id)
     {
-        for (Clinic clinic : Clinic.values())
-        {
-            if (clinic.name.equalsIgnoreCase(name)) { return clinic; }
-        }
+        this.id = id;
+    }
 
-        throw new IllegalArgumentException(String.format("Clinic \"%s\" does not exist.", name));
+    public String getLocation()
+    {
+        return location;
+    }
+
+    public void setLocation(String location)
+    {
+        this.location = location;
+    }
+
+    public Time getOpeningTime()
+    {
+        return openingTime;
+    }
+
+    public void setOpeningTime(Time openingTime)
+    {
+        this.openingTime = openingTime;
+    }
+
+    public Time getClosingTime()
+    {
+        return closingTime;
+    }
+
+    public void setClosingTime(Time closingTime)
+    {
+        this.closingTime = closingTime;
+    }
+
+    public boolean isWalkinEnabled()
+    {
+        return walkinEnabled;
+    }
+
+    public void setWalkinEnabled(boolean walkinEnabled)
+    {
+        this.walkinEnabled = walkinEnabled;
+    }
+
+    public static Clinic from(ResultSet rs) throws SQLException
+    {
+        return new Clinic(
+                rs.getInt("id"),
+                rs.getString("location"),
+                rs.getTime("opening_time"),
+                rs.getTime("closing_time"),
+                rs.getBoolean("is_walkin_enabled"));
     }
 }

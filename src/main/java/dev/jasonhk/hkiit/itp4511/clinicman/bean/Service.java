@@ -1,37 +1,62 @@
 package dev.jasonhk.hkiit.itp4511.clinicman.bean;
 
-public enum Service
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class Service
 {
-    GENERAL_CONSULTATION(1, "General Consultation"),
-    VACCINATION(2, "Vaccination"),
-    BASIC_HEALTH_SCREENING(3, "Basic Health Screening");
+    private int id;
+    private String name;
+    private int defaultDurationMinutes;
 
-    private final int id;
-    private final String name;
+    public Service(String name, int defaultDurationMinutes)
+    {
+        this.name = name;
+        this.defaultDurationMinutes = defaultDurationMinutes;
+    }
 
-    Service(int id, String name)
+    public Service(int id, String name, int defaultDurationMinutes)
     {
         this.id = id;
         this.name = name;
+        this.defaultDurationMinutes = defaultDurationMinutes;
     }
 
-    public static Service findById(int id)
+    public int getId()
     {
-        for (Service service : Service.values())
-        {
-            if (service.id == id) { return service; }
-        }
-
-        throw new IllegalArgumentException(String.format("Service #%d does not exist.", id));
+        return id;
     }
 
-    public static Service findByName(String name)
+    public void setId(int id)
     {
-        for (Service service : Service.values())
-        {
-            if (service.name.equalsIgnoreCase(name)) { return service; }
-        }
+        this.id = id;
+    }
 
-        throw new IllegalArgumentException(String.format("Service \"%s\" does not exist.", name));
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public int getDefaultDurationMinutes()
+    {
+        return defaultDurationMinutes;
+    }
+
+    public void setDefaultDurationMinutes(int defaultDurationMinutes)
+    {
+        this.defaultDurationMinutes = defaultDurationMinutes;
+    }
+
+    public static Service from(ResultSet rs) throws SQLException
+    {
+        return new Service(
+                rs.getInt("id"),
+                rs.getString("name"),
+                rs.getInt("default_duration_minutes"));
     }
 }
