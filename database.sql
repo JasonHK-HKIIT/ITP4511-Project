@@ -45,29 +45,50 @@ CREATE TABLE clinics
     status            ENUM('ACTIVE', 'SUSPENDED', 'CLOSED') NOT NULL DEFAULT 'ACTIVE'
 );
 
+-- Seed 5 clinics for development/testing
+INSERT INTO clinics (location, opening_time, closing_time, is_walkin_enabled, status)
+VALUES
+    ('Chai Wan', '09:00:00', '17:00:00', TRUE, 'ACTIVE'),
+    ('Tseung Kwan O', '09:00:00', '17:00:00', TRUE, 'ACTIVE'),
+    ('Sha Tin', '09:00:00', '17:00:00', TRUE, 'ACTIVE'),
+    ('Tuen Mun', '09:00:00', '17:00:00', TRUE, 'ACTIVE'),
+    ('Tsing Yi', '09:00:00', '17:00:00', TRUE, 'ACTIVE')
+ON DUPLICATE KEY UPDATE
+    opening_time = VALUES(opening_time),
+    closing_time = VALUES(closing_time),
+    is_walkin_enabled = VALUES(is_walkin_enabled),
+    status = VALUES(status);
+
 -- =========================
 -- 3. SERVICES
 -- =========================
 CREATE TABLE services
 (
-    service_id               INT AUTO_INCREMENT PRIMARY KEY,
-    service_name             VARCHAR(100) NOT NULL UNIQUE,
-    description              VARCHAR(255),
-    requires_approval        BOOLEAN      NOT NULL DEFAULT FALSE,
+    id                       INT AUTO_INCREMENT PRIMARY KEY,
+    name                     VARCHAR(100) NOT NULL UNIQUE,
     default_duration_minutes INT          NOT NULL DEFAULT 15,
     status                   ENUM('ACTIVE', 'INACTIVE') NOT NULL DEFAULT 'ACTIVE'
 );
+
+-- Seed 3 services for development/testing
+INSERT INTO services (name, default_duration_minutes, status)
+VALUES
+    ('General Consultation', 15, 'ACTIVE'),
+    ('Vaccination', 10, 'ACTIVE'),
+    ('Basic Health Screening', 30, 'ACTIVE')
+ON DUPLICATE KEY UPDATE
+    default_duration_minutes = VALUES(default_duration_minutes),
+    status = VALUES(status);
 
 -- =========================
 -- 4. CLINIC_SERVICES
 -- =========================
 CREATE TABLE clinic_services
 (
-    clinic_service_id  INT AUTO_INCREMENT PRIMARY KEY,
-    clinic_id          INT     NOT NULL,
-    service_id         INT     NOT NULL,
-    is_walkin_enabled  BOOLEAN NOT NULL DEFAULT TRUE,
-    slot_capacity      INT     NOT NULL DEFAULT 1,
+    id                 INT AUTO_INCREMENT PRIMARY KEY,
+    clinic_id          INT NOT NULL,
+    service_id         INT NOT NULL,
+    slot_capacity      INT NOT NULL DEFAULT 1,
     max_daily_bookings INT NULL,
     status             ENUM('ACTIVE', 'INACTIVE') NOT NULL DEFAULT 'ACTIVE',
 
@@ -76,7 +97,7 @@ CREATE TABLE clinic_services
             ON DELETE CASCADE ON UPDATE CASCADE,
 
     CONSTRAINT fk_clinic_services_service
-        FOREIGN KEY (service_id) REFERENCES services (service_id)
+        FOREIGN KEY (service_id) REFERENCES services (id)
             ON DELETE CASCADE ON UPDATE CASCADE,
 
     CONSTRAINT uq_clinic_service UNIQUE (clinic_id, service_id),
@@ -99,7 +120,7 @@ CREATE TABLE timeslots
     status            ENUM('OPEN', 'FULL', 'CANCELLED', 'CLOSED') NOT NULL DEFAULT 'OPEN',
 
     CONSTRAINT fk_timeslots_clinic_service
-        FOREIGN KEY (clinic_service_id) REFERENCES clinic_services (clinic_service_id)
+        FOREIGN KEY (clinic_service_id) REFERENCES clinic_services (id)
             ON DELETE CASCADE ON UPDATE CASCADE,
 
     CONSTRAINT uq_timeslot UNIQUE (clinic_service_id, slot_date, start_time, end_time),
@@ -174,7 +195,7 @@ CREATE TABLE queue_tickets
             ON DELETE RESTRICT ON UPDATE CASCADE,
 
     CONSTRAINT fk_queue_clinic_service
-        FOREIGN KEY (clinic_service_id) REFERENCES clinic_services (clinic_service_id)
+        FOREIGN KEY (clinic_service_id) REFERENCES clinic_services (id)
             ON DELETE RESTRICT ON UPDATE CASCADE,
 
     CONSTRAINT fk_queue_handled_by_staff
@@ -252,7 +273,7 @@ CREATE TABLE policy_settings
             ON DELETE SET NULL ON UPDATE CASCADE,
 
     CONSTRAINT fk_policy_service
-        FOREIGN KEY (service_id) REFERENCES services (service_id)
+        FOREIGN KEY (service_id) REFERENCES services (id)
             ON DELETE SET NULL ON UPDATE CASCADE,
 
     CONSTRAINT fk_policy_updated_by
