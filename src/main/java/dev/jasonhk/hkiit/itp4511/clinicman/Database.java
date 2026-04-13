@@ -3,9 +3,11 @@ package dev.jasonhk.hkiit.itp4511.clinicman;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.Gender;
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.Role;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.Clinic;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.Service;
 import dev.jasonhk.hkiit.itp4511.clinicman.bean.User;
 
 public class Database
@@ -55,5 +57,49 @@ public class Database
         }
 
         return null;
+    }
+
+    public List<Clinic> getClinics()
+    {
+        var clinics = new ArrayList<Clinic>();
+
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("SELECT * FROM clinics");
+
+            var rs = ps.executeQuery();
+            while (rs.next())
+            {
+                clinics.add(Clinic.from(rs));
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        return clinics;
+    }
+
+    public List<Service> getServices()
+    {
+        var services = new ArrayList<Service>();
+
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("SELECT * FROM clinics");
+
+            var rs = ps.executeQuery();
+            while (rs.next())
+            {
+                services.add(Service.from(rs));
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        return services;
     }
 }
