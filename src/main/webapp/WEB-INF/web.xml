@@ -3,4 +3,18 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
+
+    <context-param>
+        <param-name>database_url</param-name>
+        <param-value>jdbc:mysql://localhost:3306/itp4511_db</param-value>
+    </context-param>
+    <context-param>
+        <param-name>database_user</param-name>
+        <param-value>root</param-value>
+    </context-param>
+    <context-param>
+        <param-name>database_password</param-name>
+        <param-value></param-value>
+    </context-param>
+
 </web-app>
