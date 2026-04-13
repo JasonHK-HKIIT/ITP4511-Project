@@ -6,7 +6,7 @@
 
     <context-param>
         <param-name>database_url</param-name>
-        <param-value>jdbc:mysql://localhost:3306/itp4511_db</param-value>
+        <param-value>jdbc:mariadb://localhost:3306/itp4511_db</param-value>
     </context-param>
     <context-param>
         <param-name>database_user</param-name>

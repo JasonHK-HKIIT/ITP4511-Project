@@ -10,9 +10,9 @@ import dev.jasonhk.hkiit.itp4511.clinicman.bean.User;
 
 public class Database
 {
-    private String url;
-    private String user;
-    private String password;
+    private final String url;
+    private final String user;
+    private final String password;
 
     public Database(String url, String user, String password)
     {
@@ -25,7 +25,7 @@ public class Database
     {
         try
         {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName("org.mariadb.jdbc.Driver");
         }
         catch (ClassNotFoundException e)
         {
@@ -46,13 +46,16 @@ public class Database
             var rs = ps.executeQuery();
             if (rs.next())
             {
+                var role = rs.getString("role");
+                var gender = rs.getString("gender");
+
                 return new User(
                         rs.getInt("id"),
                         rs.getString("username"),
                         rs.getString("full_name"),
                         rs.getString("phone"),
-                        rs.getObject("role", Role.class),
-                        rs.getObject("gender", Gender.class),
+                        Role.valueOf(role),
+                        (gender != null) ? Gender.valueOf(gender) : null,
                         rs.getDate("date_of_birth"));
             }
         }

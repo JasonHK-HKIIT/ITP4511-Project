@@ -16,6 +16,22 @@ CREATE TABLE users
     date_of_birth DATE NULL
 );
 
+-- Seed 5 default users for development/testing
+INSERT INTO users (username, password, full_name, phone, role, gender, date_of_birth)
+VALUES
+    ('admin1', 'admin123', 'Admin User', '90000001', 'ADMIN', 'MALE', '1988-01-15'),
+    ('staff1', 'staff123', 'Staff User', '90000002', 'STAFF', 'FEMALE', '1992-06-20'),
+    ('patient1', 'patient123', 'Patient One', '90000003', 'PATIENT', 'MALE', '2000-03-10'),
+    ('patient2', 'patient123', 'Patient Two', '90000004', 'PATIENT', 'FEMALE', '2001-09-25'),
+    ('patient3', 'patient123', 'Patient Three', '90000005', 'PATIENT', 'MALE', '1999-12-05')
+ON DUPLICATE KEY UPDATE
+    password = VALUES(password),
+    full_name = VALUES(full_name),
+    phone = VALUES(phone),
+    role = VALUES(role),
+    gender = VALUES(gender),
+    date_of_birth = VALUES(date_of_birth);
+
 -- =========================
 -- 2. CLINICS
 -- =========================

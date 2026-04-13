@@ -1,7 +1,6 @@
 package dev.jasonhk.hkiit.itp4511.clinicman.mixin;
 
 import jakarta.servlet.ServletConfig;
-
 import dev.jasonhk.hkiit.itp4511.clinicman.Database;
 
 public interface WithDatabase
