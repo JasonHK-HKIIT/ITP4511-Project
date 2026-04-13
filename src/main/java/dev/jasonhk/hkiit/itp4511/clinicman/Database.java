@@ -46,17 +46,7 @@ public class Database
             var rs = ps.executeQuery();
             if (rs.next())
             {
-                var role = rs.getString("role");
-                var gender = rs.getString("gender");
-
-                return new User(
-                        rs.getInt("id"),
-                        rs.getString("username"),
-                        rs.getString("full_name"),
-                        rs.getString("phone"),
-                        Role.valueOf(role),
-                        (gender != null) ? Gender.valueOf(gender) : null,
-                        rs.getDate("date_of_birth"));
+                return User.from(rs);
             }
         }
         catch (SQLException e)
