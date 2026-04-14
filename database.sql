@@ -105,6 +105,30 @@ CREATE TABLE clinic_services
     CONSTRAINT chk_max_daily_bookings CHECK (max_daily_bookings IS NULL OR max_daily_bookings > 0)
 );
 
+-- Seed clinic-service mappings manually (1-hour slot capacity by service duration)
+-- General Consultation (15 mins) -> 4, Vaccination (10 mins) -> 6, Basic Health Screening (30 mins) -> 2
+INSERT INTO clinic_services (clinic_id, service_id, slot_capacity, max_daily_bookings, status)
+VALUES
+    (1, 1, 4, 80, 'ACTIVE'),
+    (1, 2, 6, 80, 'ACTIVE'),
+    (1, 3, 2, 80, 'ACTIVE'),
+    (2, 1, 4, 80, 'ACTIVE'),
+    (2, 2, 6, 80, 'ACTIVE'),
+    (2, 3, 2, 80, 'ACTIVE'),
+    (3, 1, 4, 80, 'ACTIVE'),
+    (3, 2, 6, 80, 'ACTIVE'),
+    (3, 3, 2, 80, 'ACTIVE'),
+    (4, 1, 4, 80, 'ACTIVE'),
+    (4, 2, 6, 80, 'ACTIVE'),
+    (4, 3, 2, 80, 'ACTIVE'),
+    (5, 1, 4, 80, 'ACTIVE'),
+    (5, 2, 6, 80, 'ACTIVE'),
+    (5, 3, 2, 80, 'ACTIVE')
+ON DUPLICATE KEY UPDATE
+    slot_capacity = VALUES(slot_capacity),
+    max_daily_bookings = VALUES(max_daily_bookings),
+    status = VALUES(status);
+
 -- =========================
 -- 5. TIMESLOTS
 -- =========================

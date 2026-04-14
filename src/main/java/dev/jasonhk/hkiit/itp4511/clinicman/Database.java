@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dev.jasonhk.hkiit.itp4511.clinicman.bean.Clinic;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.ClinicService;
 import dev.jasonhk.hkiit.itp4511.clinicman.bean.Service;
 import dev.jasonhk.hkiit.itp4511.clinicman.bean.User;
 
@@ -87,7 +88,7 @@ public class Database
 
         try (var c = getConnection())
         {
-            var ps = c.prepareStatement("SELECT * FROM clinics");
+            var ps = c.prepareStatement("SELECT * FROM services");
 
             var rs = ps.executeQuery();
             while (rs.next())
@@ -101,5 +102,27 @@ public class Database
         }
 
         return services;
+    }
+
+    public List<ClinicService> getClinicServices()
+    {
+        var clinicServices = new ArrayList<ClinicService>();
+
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("SELECT * FROM clinic_services");
+
+            var rs = ps.executeQuery();
+            while (rs.next())
+            {
+                clinicServices.add(ClinicService.from(rs));
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        return clinicServices;
     }
 }

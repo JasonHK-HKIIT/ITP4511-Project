@@ -3,9 +3,12 @@ package dev.jasonhk.hkiit.itp4511.clinicman.bean;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.time.format.DateTimeFormatter;
 
 public class Clinic
 {
+    private static final DateTimeFormatter OPENING_HOURS = DateTimeFormatter.ofPattern("HH:mm");
+
     private int id;
     private String location;
     private Time openingTime;
@@ -77,6 +80,16 @@ public class Clinic
     public void setWalkinEnabled(boolean walkinEnabled)
     {
         this.walkinEnabled = walkinEnabled;
+    }
+
+    public String toFormattedOpeningTime()
+    {
+        return openingTime.toLocalTime().format(OPENING_HOURS);
+    }
+
+    public String toFormattedClosingTime()
+    {
+        return closingTime.toLocalTime().format(OPENING_HOURS);
     }
 
     public static Clinic from(ResultSet rs) throws SQLException
