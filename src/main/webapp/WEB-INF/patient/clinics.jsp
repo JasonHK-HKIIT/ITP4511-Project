@@ -1,6 +1,9 @@
-<%@ page contentType="text/html; charset=UTF-8" import="java.time.format.DateTimeFormatter" %>
+<%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<html>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<fmt:setLocale value="en-HK" />
+
+<html lang="en">
 <head>
     <title>Clinics</title>
     <link rel="stylesheet" href="/css/pico.slate.min.css">
@@ -27,7 +30,9 @@
             <details>
                 <summary><strong>${clinic.location}</strong></summary>
                 <p>
-                    <strong>Opening hours:</strong> ${clinic.toFormattedOpeningTime()}&ndash;${clinic.toFormattedClosingTime()}
+                    <fmt:formatDate value="${clinic.openingTime}" type="time" timeStyle="short" var="openingTime" />
+                    <fmt:formatDate value="${clinic.closingTime}" type="time" timeStyle="short" var="closingTime" />
+                    <strong>Opening hours:</strong> ${openingTime} &ndash; ${closingTime}
                 </p>
                 <p>
                     <strong>Services:</strong>
@@ -35,9 +40,13 @@
                         <c:forEach items="${clinicServices.get(clinic.id)}" var="service">
                             <li>
                                 ${services.get(service.serviceId).name}
-                                <a href="/appointments/book?service=${service.id}">[Book Appointment]</a>
+                                <c:url value="/appointments" var="bookAppointment">
+                                    <c:param name="action" value="book" />
+                                    <c:param name="service" value="${service.id}" />
+                                </c:url>
+                                <a href="${bookAppointment}">[Book Appointment]</a>
                                 <c:if test="${clinic.walkinEnabled}">
-                                    <a href="/queue/join?service=${service.id}">[Join Queue]</a>
+                                    <a href="/queue?action=join&service=${service.id}">[Join Queue]</a>
                                 </c:if>
                             </li>
                         </c:forEach>
