@@ -16,6 +16,7 @@ services:
       MARIADB_USER: itp4511
       MARIADB_PASSWORD: itp4511
       MARIADB_ROOT_PASSWORD: ""
+      TZ: Asia/Hong_Kong
     volumes:
       - ./database.sql:/docker-entrypoint-initdb.d/database.sql:ro
     tmpfs:
