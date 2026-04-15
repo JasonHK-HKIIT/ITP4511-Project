@@ -48,11 +48,11 @@ CREATE TABLE clinics
 -- Seed 5 clinics for development/testing
 INSERT INTO clinics (location, opening_time, closing_time, is_walkin_enabled, status)
 VALUES
-    ('Chai Wan', '09:00:00', '17:00:00', TRUE, 'ACTIVE'),
-    ('Tseung Kwan O', '09:00:00', '17:00:00', TRUE, 'ACTIVE'),
-    ('Sha Tin', '09:00:00', '17:00:00', TRUE, 'ACTIVE'),
-    ('Tuen Mun', '09:00:00', '17:00:00', TRUE, 'ACTIVE'),
-    ('Tsing Yi', '09:00:00', '17:00:00', TRUE, 'ACTIVE')
+    ('Chai Wan', '09:00:00', '18:00:00', TRUE, 'ACTIVE'),
+    ('Tseung Kwan O', '09:00:00', '18:00:00', TRUE, 'ACTIVE'),
+    ('Sha Tin', '09:00:00', '18:00:00', TRUE, 'ACTIVE'),
+    ('Tuen Mun', '09:00:00', '18:00:00', FALSE, 'ACTIVE'),
+    ('Tsing Yi', '09:00:00', '18:00:00', TRUE, 'ACTIVE')
 ON DUPLICATE KEY UPDATE
     opening_time = VALUES(opening_time),
     closing_time = VALUES(closing_time),
@@ -134,7 +134,7 @@ ON DUPLICATE KEY UPDATE
 -- =========================
 CREATE TABLE timeslots
 (
-    timeslot_id       INT AUTO_INCREMENT PRIMARY KEY,
+    id                INT AUTO_INCREMENT PRIMARY KEY,
     clinic_service_id INT  NOT NULL,
     slot_date         DATE NOT NULL,
     start_time        TIME NOT NULL,
@@ -153,18 +153,83 @@ CREATE TABLE timeslots
     CONSTRAINT chk_timeslot_time CHECK (end_time > start_time)
 );
 
+-- Seed timeslots for clinic 1 services (assumes clinic_service_id 1, 2, 3)
+-- Dates: today and tomorrow; hourly windows: 09:00-13:00 and 14:00-18:00
+INSERT INTO timeslots (clinic_service_id, slot_date, start_time, end_time, capacity, booked_count, status)
+VALUES
+    -- Today - clinic_service_id 1 (General Consultation, capacity 4)
+    (1, CURDATE(), '09:00:00', '10:00:00', 4, 0, 'OPEN'),
+    (1, CURDATE(), '10:00:00', '11:00:00', 4, 0, 'OPEN'),
+    (1, CURDATE(), '11:00:00', '12:00:00', 4, 0, 'OPEN'),
+    (1, CURDATE(), '12:00:00', '13:00:00', 4, 0, 'OPEN'),
+    (1, CURDATE(), '14:00:00', '15:00:00', 4, 0, 'OPEN'),
+    (1, CURDATE(), '15:00:00', '16:00:00', 4, 0, 'OPEN'),
+    (1, CURDATE(), '16:00:00', '17:00:00', 4, 0, 'OPEN'),
+    (1, CURDATE(), '17:00:00', '18:00:00', 4, 0, 'OPEN'),
+
+    -- Today - clinic_service_id 2 (Vaccination, capacity 6)
+    (2, CURDATE(), '09:00:00', '10:00:00', 6, 0, 'OPEN'),
+    (2, CURDATE(), '10:00:00', '11:00:00', 6, 0, 'OPEN'),
+    (2, CURDATE(), '11:00:00', '12:00:00', 6, 0, 'OPEN'),
+    (2, CURDATE(), '12:00:00', '13:00:00', 6, 0, 'OPEN'),
+    (2, CURDATE(), '14:00:00', '15:00:00', 6, 0, 'OPEN'),
+    (2, CURDATE(), '15:00:00', '16:00:00', 6, 0, 'OPEN'),
+    (2, CURDATE(), '16:00:00', '17:00:00', 6, 0, 'OPEN'),
+    (2, CURDATE(), '17:00:00', '18:00:00', 6, 0, 'OPEN'),
+
+    -- Today - clinic_service_id 3 (Basic Health Screening, capacity 2)
+    (3, CURDATE(), '09:00:00', '10:00:00', 2, 0, 'OPEN'),
+    (3, CURDATE(), '10:00:00', '11:00:00', 2, 0, 'OPEN'),
+    (3, CURDATE(), '11:00:00', '12:00:00', 2, 0, 'OPEN'),
+    (3, CURDATE(), '12:00:00', '13:00:00', 2, 0, 'OPEN'),
+    (3, CURDATE(), '14:00:00', '15:00:00', 2, 0, 'OPEN'),
+    (3, CURDATE(), '15:00:00', '16:00:00', 2, 0, 'OPEN'),
+    (3, CURDATE(), '16:00:00', '17:00:00', 2, 0, 'OPEN'),
+    (3, CURDATE(), '17:00:00', '18:00:00', 2, 0, 'OPEN'),
+
+    -- Tomorrow - clinic_service_id 1 (General Consultation, capacity 4)
+    (1, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '09:00:00', '10:00:00', 4, 0, 'OPEN'),
+    (1, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '10:00:00', '11:00:00', 4, 4, 'OPEN'),
+    (1, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '11:00:00', '12:00:00', 4, 0, 'OPEN'),
+    (1, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '12:00:00', '13:00:00', 4, 0, 'OPEN'),
+    (1, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '14:00:00', '15:00:00', 4, 0, 'OPEN'),
+    (1, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '15:00:00', '16:00:00', 4, 0, 'OPEN'),
+    (1, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '16:00:00', '17:00:00', 4, 0, 'OPEN'),
+    (1, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '17:00:00', '18:00:00', 4, 0, 'OPEN'),
+
+    -- Tomorrow - clinic_service_id 2 (Vaccination, capacity 6)
+    (2, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '09:00:00', '10:00:00', 6, 0, 'OPEN'),
+    (2, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '10:00:00', '11:00:00', 6, 0, 'OPEN'),
+    (2, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '11:00:00', '12:00:00', 6, 0, 'OPEN'),
+    (2, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '12:00:00', '13:00:00', 6, 0, 'OPEN'),
+    (2, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '14:00:00', '15:00:00', 6, 0, 'OPEN'),
+    (2, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '15:00:00', '16:00:00', 6, 0, 'OPEN'),
+    (2, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '16:00:00', '17:00:00', 6, 0, 'OPEN'),
+    (2, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '17:00:00', '18:00:00', 6, 0, 'OPEN'),
+
+    -- Tomorrow - clinic_service_id 3 (Basic Health Screening, capacity 2)
+    (3, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '09:00:00', '10:00:00', 2, 0, 'OPEN'),
+    (3, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '10:00:00', '11:00:00', 2, 0, 'OPEN'),
+    (3, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '11:00:00', '12:00:00', 2, 0, 'OPEN'),
+    (3, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '12:00:00', '13:00:00', 2, 0, 'OPEN'),
+    (3, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '14:00:00', '15:00:00', 2, 0, 'OPEN'),
+    (3, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '15:00:00', '16:00:00', 2, 0, 'OPEN'),
+    (3, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '16:00:00', '17:00:00', 2, 0, 'OPEN'),
+    (3, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '17:00:00', '18:00:00', 2, 0, 'OPEN')
+ON DUPLICATE KEY UPDATE
+    id = id;
+
 -- =========================
 -- 6. APPOINTMENTS
 -- =========================
 CREATE TABLE appointments
 (
-    appointment_id       INT AUTO_INCREMENT PRIMARY KEY,
-    patient_id           INT         NOT NULL,
-    timeslot_id          INT         NOT NULL,
-    appointment_no       VARCHAR(30) NOT NULL UNIQUE,
+    id                   INT AUTO_INCREMENT PRIMARY KEY,
+    patient_id           INT      NOT NULL,
+    timeslot_id          INT      NOT NULL,
     status               ENUM('PENDING', 'CONFIRMED', 'ARRIVED', 'COMPLETED', 'NO_SHOW', 'CANCELLED') NOT NULL DEFAULT 'CONFIRMED',
     approval_status      ENUM('NOT_REQUIRED', 'PENDING', 'APPROVED', 'REJECTED') NOT NULL DEFAULT 'NOT_REQUIRED',
-    booked_at            DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    booked_at            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     rescheduled_from_id  INT NULL,
     cancelled_by_user_id INT NULL,
     cancel_reason        VARCHAR(255) NULL,
@@ -177,11 +242,11 @@ CREATE TABLE appointments
             ON DELETE RESTRICT ON UPDATE CASCADE,
 
     CONSTRAINT fk_appointments_timeslot
-        FOREIGN KEY (timeslot_id) REFERENCES timeslots (timeslot_id)
+        FOREIGN KEY (timeslot_id) REFERENCES timeslots (id)
             ON DELETE RESTRICT ON UPDATE CASCADE,
 
     CONSTRAINT fk_appointments_rescheduled_from
-        FOREIGN KEY (rescheduled_from_id) REFERENCES appointments (appointment_id)
+        FOREIGN KEY (rescheduled_from_id) REFERENCES appointments (id)
             ON DELETE SET NULL ON UPDATE CASCADE,
 
     CONSTRAINT fk_appointments_cancelled_by
@@ -248,7 +313,7 @@ CREATE TABLE notifications
             ON DELETE CASCADE ON UPDATE CASCADE,
 
     CONSTRAINT fk_notifications_appointment
-        FOREIGN KEY (related_appointment_id) REFERENCES appointments (appointment_id)
+        FOREIGN KEY (related_appointment_id) REFERENCES appointments (id)
             ON DELETE SET NULL ON UPDATE CASCADE,
 
     CONSTRAINT fk_notifications_queue_ticket

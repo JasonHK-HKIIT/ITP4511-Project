@@ -3,13 +3,11 @@ package dev.jasonhk.hkiit.itp4511.clinicman;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.Clinic;
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.ClinicService;
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.Service;
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.User;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.*;
 
 public class Database
 {
@@ -30,11 +28,7 @@ public class Database
         {
             Class.forName("org.mariadb.jdbc.Driver");
         }
-        catch (ClassNotFoundException e)
-        {
-            throw new RuntimeException(e);
-        }
-
+        catch (ClassNotFoundException e) { throw new RuntimeException(e); }
         return DriverManager.getConnection(url, user, password);
     }
 
@@ -47,16 +41,9 @@ public class Database
             ps.setString(2, password);
 
             var rs = ps.executeQuery();
-            if (rs.next())
-            {
-                return User.from(rs);
-            }
+            if (rs.next()) { return User.from(rs); }
         }
-        catch (SQLException e)
-        {
-            throw new RuntimeException(e);
-        }
-
+        catch (SQLException e) { throw new RuntimeException(e); }
         return null;
     }
 
@@ -67,19 +54,25 @@ public class Database
         try (var c = getConnection())
         {
             var ps = c.prepareStatement("SELECT * FROM clinics");
+            var rs = ps.executeQuery();
+            while (rs.next()) { clinics.add(Clinic.from(rs)); }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return clinics;
+    }
+
+    public Clinic getClinicById(int id)
+    {
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("SELECT * FROM clinics WHERE id = ?");
+            ps.setInt(1, id);
 
             var rs = ps.executeQuery();
-            while (rs.next())
-            {
-                clinics.add(Clinic.from(rs));
-            }
+            if (rs.next()) { return Clinic.from(rs); }
         }
-        catch (SQLException e)
-        {
-            throw new RuntimeException(e);
-        }
-
-        return clinics;
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return null;
     }
 
     public List<Service> getServices()
@@ -89,19 +82,25 @@ public class Database
         try (var c = getConnection())
         {
             var ps = c.prepareStatement("SELECT * FROM services");
+            var rs = ps.executeQuery();
+            while (rs.next()) { services.add(Service.from(rs)); }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return services;
+    }
+
+    public Service getServiceById(int id)
+    {
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("SELECT * FROM services WHERE id = ?");
+            ps.setInt(1, id);
 
             var rs = ps.executeQuery();
-            while (rs.next())
-            {
-                services.add(Service.from(rs));
-            }
+            if (rs.next()) { return Service.from(rs); }
         }
-        catch (SQLException e)
-        {
-            throw new RuntimeException(e);
-        }
-
-        return services;
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return null;
     }
 
     public List<ClinicService> getClinicServices()
@@ -111,18 +110,51 @@ public class Database
         try (var c = getConnection())
         {
             var ps = c.prepareStatement("SELECT * FROM clinic_services");
-
             var rs = ps.executeQuery();
-            while (rs.next())
-            {
-                clinicServices.add(ClinicService.from(rs));
-            }
+            while (rs.next()) { clinicServices.add(ClinicService.from(rs)); }
         }
-        catch (SQLException e)
-        {
-            throw new RuntimeException(e);
-        }
-
+        catch (SQLException e) { throw new RuntimeException(e); }
         return clinicServices;
     }
+
+    public ClinicService getClinicServiceById(int id)
+    {
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("SELECT * FROM clinic_services WHERE id = ?");
+            ps.setInt(1, id);
+
+            var rs = ps.executeQuery();
+            if (rs.next()) { return ClinicService.from(rs); }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return null;
+    }
+
+    public List<Timeslot> getTimeslotsByClinicServiceAndDate(ClinicService clinicService, LocalDate date)
+    {
+        return getTimeslotsByClinicServiceAndDate(clinicService.getId(), date);
+    }
+
+    public List<Timeslot> getTimeslotsByClinicServiceAndDate(int clinicServiceId, LocalDate date)
+    {
+        var timeslots = new ArrayList<Timeslot>();
+
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("SELECT * FROM timeslots WHERE clinic_service_id = ? AND slot_date = ? ORDER BY start_time");
+            ps.setInt(1, clinicServiceId);
+            ps.setObject(2, date);
+
+            var rs = ps.executeQuery();
+            while (rs.next()) { timeslots.add(Timeslot.from(rs)); }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return timeslots;
+    }
+
+//    public List<Appointment> getAppointmentsByPatient(User user)
+//    {
+//
+//    }
 }
