@@ -104,15 +104,13 @@ public class User
 
     public static User from(ResultSet rs) throws SQLException
     {
-        var role = rs.getString("role");
         var gender = rs.getString("gender");
-
         return new User(
                 rs.getInt("id"),
                 rs.getString("username"),
                 rs.getString("full_name"),
                 rs.getString("phone"),
-                Role.valueOf(role),
+                Role.valueOf(rs.getString("role")),
                 (gender != null) ? Gender.valueOf(gender) : null,
                 rs.getDate("date_of_birth"));
     }

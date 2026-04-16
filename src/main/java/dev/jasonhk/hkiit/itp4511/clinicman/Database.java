@@ -3,6 +3,7 @@ package dev.jasonhk.hkiit.itp4511.clinicman;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -153,8 +154,75 @@ public class Database
         return timeslots;
     }
 
-//    public List<Appointment> getAppointmentsByPatient(User user)
-//    {
-//
-//    }
+    public Appointment addAppointment(int patientId, int timeslotId)
+    {
+        try (var c = getConnection())
+        {
+            c.setAutoCommit(false);
+
+            int id;
+            try (var ps = c.prepareStatement("INSERT INTO appointments (patient_id, timeslot_id) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS))
+            {
+                ps.setInt(1, patientId);
+                ps.setInt(2, timeslotId);
+
+                ps.executeUpdate();
+                var rs = ps.getGeneratedKeys();
+                if (!rs.next()) { throw new IllegalStateException("No appointment was inserted"); }
+
+                id = rs.getInt(1);
+            }
+            catch (SQLException | IllegalStateException e)
+            {
+                c.rollback();
+                throw e;
+            }
+
+            try (var ps = c.prepareStatement("UPDATE timeslots SET booked_count = booked_count + 1 WHERE id = ?"))
+            {
+                ps.setInt(1, timeslotId);
+
+                var affectedRows = ps.executeUpdate();
+                if (affectedRows == 0) { throw new IllegalStateException(String.format("Failed to update timeslot #%s", timeslotId)); }
+            }
+            catch (SQLException | IllegalStateException e)
+            {
+                c.rollback();
+                throw e;
+            }
+
+            try (var ps = c.prepareStatement("SELECT * FROM appointments WHERE id = ?"))
+            {
+                ps.setInt(1, id);
+
+                var rs = ps.executeQuery();
+                if (!rs.next()) { throw new IllegalStateException(String.format("Failed to query appointment #%d", id)); }
+
+                c.commit();
+                return Appointment.from(rs);
+            }
+            catch (SQLException | IllegalStateException e)
+            {
+                c.rollback();
+                throw e;
+            }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+    }
+
+    public List<Appointment> getAppointmentsByPatient(User user)
+    {
+        var appointments = new ArrayList<Appointment>();
+
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("SELECT appointments.* FROM appointments LEFT JOIN timeslots ON appointments.timeslot_id = timeslots.id WHERE patient_id = ? ORDER BY slot_date DESC, start_time");
+            ps.setInt(1, user.getId());
+
+            var rs = ps.executeQuery();
+            while (rs.next()) { appointments.add(Appointment.from(rs)); }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return appointments;
+    }
 }

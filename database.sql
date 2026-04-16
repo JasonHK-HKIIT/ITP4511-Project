@@ -224,18 +224,13 @@ ON DUPLICATE KEY UPDATE
 -- =========================
 CREATE TABLE appointments
 (
-    id                   INT AUTO_INCREMENT PRIMARY KEY,
-    patient_id           INT      NOT NULL,
-    timeslot_id          INT      NOT NULL,
-    status               ENUM('PENDING', 'CONFIRMED', 'ARRIVED', 'COMPLETED', 'NO_SHOW', 'CANCELLED') NOT NULL DEFAULT 'CONFIRMED',
-    approval_status      ENUM('NOT_REQUIRED', 'PENDING', 'APPROVED', 'REJECTED') NOT NULL DEFAULT 'NOT_REQUIRED',
-    booked_at            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    rescheduled_from_id  INT NULL,
-    cancelled_by_user_id INT NULL,
-    cancel_reason        VARCHAR(255) NULL,
-    attendance_marked_by INT NULL,
-    attendance_marked_at DATETIME NULL,
-    remarks              VARCHAR(255) NULL,
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    patient_id      INT      NOT NULL,
+    timeslot_id     INT      NOT NULL,
+    status          ENUM('PENDING', 'CONFIRMED', 'ARRIVED', 'COMPLETED', 'NO_SHOW', 'CANCELLED') NOT NULL DEFAULT 'PENDING',
+    approval_status ENUM('NOT_REQUIRED', 'PENDING', 'APPROVED', 'REJECTED') NOT NULL DEFAULT 'NOT_REQUIRED',
+    booked_at       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    cancel_reason   VARCHAR(255) NULL,
 
     CONSTRAINT fk_appointments_patient
         FOREIGN KEY (patient_id) REFERENCES users (id)
@@ -243,19 +238,7 @@ CREATE TABLE appointments
 
     CONSTRAINT fk_appointments_timeslot
         FOREIGN KEY (timeslot_id) REFERENCES timeslots (id)
-            ON DELETE RESTRICT ON UPDATE CASCADE,
-
-    CONSTRAINT fk_appointments_rescheduled_from
-        FOREIGN KEY (rescheduled_from_id) REFERENCES appointments (id)
-            ON DELETE SET NULL ON UPDATE CASCADE,
-
-    CONSTRAINT fk_appointments_cancelled_by
-        FOREIGN KEY (cancelled_by_user_id) REFERENCES users (id)
-            ON DELETE SET NULL ON UPDATE CASCADE,
-
-    CONSTRAINT fk_appointments_attendance_marked_by
-        FOREIGN KEY (attendance_marked_by) REFERENCES users (id)
-            ON DELETE SET NULL ON UPDATE CASCADE
+            ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- Helps reduce accidental double-booking checks per patient and slot

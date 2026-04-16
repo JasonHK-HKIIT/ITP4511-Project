@@ -2,9 +2,10 @@ package dev.jasonhk.hkiit.itp4511.clinicman.bean;
 
 public enum AppointmentStatus
 {
-    APPOINTED,
-    CANCELED,
+    PENDING,
+    CONFIRMED,
     ARRIVED,
     COMPLETED,
     NO_SHOW,
+    CANCELLED,
 }

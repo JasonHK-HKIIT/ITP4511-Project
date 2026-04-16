@@ -1,14 +1,9 @@
 package dev.jasonhk.hkiit.itp4511.clinicman.controller.patient;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.Objects;
 
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.Appointment;
-import dev.jasonhk.hkiit.itp4511.clinicman.mixin.WithUser;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -18,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import dev.jasonhk.hkiit.itp4511.clinicman.Database;
 import dev.jasonhk.hkiit.itp4511.clinicman.mixin.WithDatabase;
+import dev.jasonhk.hkiit.itp4511.clinicman.mixin.WithUser;
 
 @WebServlet("/appointments")
 public class AppointmentsController extends HttpServlet implements WithDatabase, WithUser
@@ -90,8 +86,9 @@ public class AppointmentsController extends HttpServlet implements WithDatabase,
             {
                 var user = getCurrentUser(request);
                 var timeslotId = Integer.parseInt(request.getParameter("timeslot"));
-                // TODO
-                // var appointment = new Appointment(user.getId(), timeslotId);
+                var appointment = database.addAppointment(user.getId(), timeslotId);
+
+                response.sendRedirect(String.format("/appointments?action=view&id=%d", appointment.getId()));
             }
             default -> response.sendError(HttpServletResponse.SC_BAD_REQUEST, String.format("Action %s is not supported", action));
         }

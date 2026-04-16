@@ -1,71 +1,63 @@
 package dev.jasonhk.hkiit.itp4511.clinicman.bean;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 public class Appointment
 {
-    private Clinic clinic;
-    private Service service;
-    private LocalDate date;
-    private LocalTime time;
-    private AppointmentStatus status = AppointmentStatus.APPOINTED;
+    private int id;
+    private int patientId;
+    private int timeslotId;
+    private AppointmentStatus status;
+    private LocalDateTime bookedAt;
+    private String cancelReason;
 
-    public Appointment(Clinic clinic, Service service, LocalDate date, LocalTime time)
+    public Appointment(int id, int patientId, int timeslotId)
     {
-        this.clinic = clinic;
-        this.service = service;
-        this.date = date;
-        this.time = time;
+        this.id = id;
+        this.patientId = patientId;
+        this.timeslotId = timeslotId;
     }
 
-    public Appointment(Clinic clinic, Service service, LocalDate date, LocalTime time, AppointmentStatus status)
+    public Appointment(int id, int patientId, int timeslotId, AppointmentStatus status, LocalDateTime bookedAt, String cancelReason)
     {
-        this.clinic = clinic;
-        this.service = service;
-        this.date = date;
-        this.time = time;
+        this.id = id;
+        this.patientId = patientId;
+        this.timeslotId = timeslotId;
         this.status = status;
+        this.bookedAt = bookedAt;
+        this.cancelReason = cancelReason;
     }
 
-    public Clinic getClinic()
+    public int getId()
     {
-        return clinic;
+        return id;
     }
 
-    public void setClinic(Clinic clinic)
+    public void setId(int id)
     {
-        this.clinic = clinic;
+        this.id = id;
     }
 
-    public Service getService()
+    public int getPatientId()
     {
-        return service;
+        return patientId;
     }
 
-    public void setService(Service service)
+    public void setPatientId(int patientId)
     {
-        this.service = service;
+        this.patientId = patientId;
     }
 
-    public LocalDate getDate()
+    public int getTimeslotId()
     {
-        return date;
+        return timeslotId;
     }
 
-    public void setDate(LocalDate date)
+    public void setTimeslotId(int timeslotId)
     {
-        this.date = date;
-    }
-
-    public LocalTime getTime()
-    {
-        return time;
-    }
-
-    public void setTime(LocalTime time)
-    {
-        this.time = time;
+        this.timeslotId = timeslotId;
     }
 
     public AppointmentStatus getStatus()
@@ -76,5 +68,36 @@ public class Appointment
     public void setStatus(AppointmentStatus status)
     {
         this.status = status;
+    }
+
+    public LocalDateTime getBookedAt()
+    {
+        return bookedAt;
+    }
+
+    public void setBookedAt(LocalDateTime bookedAt)
+    {
+        this.bookedAt = bookedAt;
+    }
+
+    public String getCancelReason()
+    {
+        return cancelReason;
+    }
+
+    public void setCancelReason(String cancelReason)
+    {
+        this.cancelReason = cancelReason;
+    }
+
+    public static Appointment from(ResultSet rs) throws SQLException
+    {
+        return new Appointment(
+                rs.getInt("id"),
+                rs.getInt("patient_id"),
+                rs.getInt("timeslot_id"),
+                AppointmentStatus.valueOf(rs.getString("status")),
+                rs.getObject("booked_at", LocalDateTime.class),
+                rs.getString("cancel_reason"));
     }
 }
