@@ -6,33 +6,20 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import dev.jasonhk.hkiit.itp4511.clinicman.bean.Clinic;
 import dev.jasonhk.hkiit.itp4511.clinicman.bean.ClinicService;
 import dev.jasonhk.hkiit.itp4511.clinicman.bean.Service;
 import dev.jasonhk.hkiit.itp4511.clinicman.bean.Timeslot;
-import jakarta.servlet.ServletConfig;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-import dev.jasonhk.hkiit.itp4511.clinicman.Database;
-import dev.jasonhk.hkiit.itp4511.clinicman.mixin.WithDatabase;
-import dev.jasonhk.hkiit.itp4511.clinicman.mixin.WithUser;
+import dev.jasonhk.hkiit.itp4511.clinicman.controller.Controller;
 
 @WebServlet("/appointments")
-public class AppointmentsController extends HttpServlet implements WithDatabase, WithUser
+public class AppointmentsController extends Controller
 {
-    private Database database;
-
-    @Override
-    public void init(ServletConfig config) throws ServletException
-    {
-        super.init(config);
-        database = getDatabase(config);
-    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
