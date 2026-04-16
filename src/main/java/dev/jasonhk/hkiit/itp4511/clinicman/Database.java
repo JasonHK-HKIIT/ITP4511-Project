@@ -53,8 +53,8 @@ public class Database
 
         try (var c = getConnection())
         {
-            var ps = c.prepareStatement("SELECT * FROM clinics");
-            var rs = ps.executeQuery();
+            var s = c.createStatement();
+            var rs = s.executeQuery("SELECT * FROM clinics");
             while (rs.next()) { clinics.add(Clinic.from(rs)); }
         }
         catch (SQLException e) { throw new RuntimeException(e); }
@@ -81,8 +81,8 @@ public class Database
 
         try (var c = getConnection())
         {
-            var ps = c.prepareStatement("SELECT * FROM services");
-            var rs = ps.executeQuery();
+            var s = c.createStatement();
+            var rs = s.executeQuery("SELECT * FROM services");
             while (rs.next()) { services.add(Service.from(rs)); }
         }
         catch (SQLException e) { throw new RuntimeException(e); }
@@ -109,8 +109,8 @@ public class Database
 
         try (var c = getConnection())
         {
-            var ps = c.prepareStatement("SELECT * FROM clinic_services");
-            var rs = ps.executeQuery();
+            var s = c.createStatement();
+            var rs = s.executeQuery("SELECT * FROM clinic_services");
             while (rs.next()) { clinicServices.add(ClinicService.from(rs)); }
         }
         catch (SQLException e) { throw new RuntimeException(e); }
