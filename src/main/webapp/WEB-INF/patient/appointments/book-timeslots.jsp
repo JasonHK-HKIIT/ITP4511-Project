@@ -8,7 +8,7 @@
 <option selected disabled></option>
 <c:forEach items="${timeslots}" var="timeslot">
     <c:set var="vacancy" value="${timeslot.capacity - timeslot.bookedCount}" />
-    <option value="${timeslot.id}" ${(vacancy <= 0) ? 'disabled' : ''}>
+    <option value="${timeslot.id}"${((vacancy <= 0) && (timeslot.id != param.timeslotId)) ? ' disabled' : ''}${(timeslot.id == param.timeslotId) ? ' selected' : ''}>
             ${timeslot.startTime} &ndash; ${timeslot.endTime} (Vacancy: ${vacancy})
     </option>
 </c:forEach>
