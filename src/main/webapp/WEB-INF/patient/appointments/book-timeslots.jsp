@@ -8,8 +8,7 @@
 <option selected disabled></option>
 <c:forEach items="${timeslots}" var="timeslot">
     <c:set var="vacancy" value="${timeslot.capacity - timeslot.bookedCount}" />
-
-    <fmt:formatDate value="${timeslot.startTime}" type="time" timeStyle="short" var="startTime" />
-    <fmt:formatDate value="${timeslot.endTime}" type="time" timeStyle="short" var="endTime" />
-    <option value="${timeslot.id}" ${(vacancy <= 0) ? 'disabled' : ''}>${startTime} &ndash; ${endTime} (Vacancy: ${vacancy})</option>
+    <option value="${timeslot.id}" ${(vacancy <= 0) ? 'disabled' : ''}>
+            ${timeslot.startTime} &ndash; ${timeslot.endTime} (Vacancy: ${vacancy})
+    </option>
 </c:forEach>

@@ -2,26 +2,17 @@ package dev.jasonhk.hkiit.itp4511.clinicman.bean;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalTime;
 
 public class Clinic
 {
     private int id;
     private String location;
-    private Time openingTime;
-    private Time closingTime;
+    private LocalTime openingTime;
+    private LocalTime closingTime;
     private boolean walkinEnabled;
 
-    public Clinic(String location, Time openingTime, Time closingTime, boolean walkinEnabled)
-    {
-        this.location = location;
-        this.openingTime = openingTime;
-        this.closingTime = closingTime;
-        this.walkinEnabled = walkinEnabled;
-    }
-
-    public Clinic(int id, String location, Time openingTime, Time closingTime, boolean walkinEnabled)
+    public Clinic(int id, String location, LocalTime openingTime, LocalTime closingTime, boolean walkinEnabled)
     {
         this.id = id;
         this.location = location;
@@ -50,22 +41,22 @@ public class Clinic
         this.location = location;
     }
 
-    public Time getOpeningTime()
+    public LocalTime getOpeningTime()
     {
         return openingTime;
     }
 
-    public void setOpeningTime(Time openingTime)
+    public void setOpeningTime(LocalTime openingTime)
     {
         this.openingTime = openingTime;
     }
 
-    public Time getClosingTime()
+    public LocalTime getClosingTime()
     {
         return closingTime;
     }
 
-    public void setClosingTime(Time closingTime)
+    public void setClosingTime(LocalTime closingTime)
     {
         this.closingTime = closingTime;
     }
@@ -85,8 +76,8 @@ public class Clinic
         return new Clinic(
                 rs.getInt("id"),
                 rs.getString("location"),
-                rs.getTime("opening_time"),
-                rs.getTime("closing_time"),
+                rs.getObject("opening_time", LocalTime.class),
+                rs.getObject("closing_time", LocalTime.class),
                 rs.getBoolean("is_walkin_enabled"));
     }
 }

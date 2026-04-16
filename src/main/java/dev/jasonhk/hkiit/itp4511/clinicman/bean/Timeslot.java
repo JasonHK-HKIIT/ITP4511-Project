@@ -2,30 +2,20 @@ package dev.jasonhk.hkiit.itp4511.clinicman.bean;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class Timeslot
 {
     private int id;
     private int clinicServiceId;
-    private Date slotDate;
-    private Time startTime;
-    private Time endTime;
+    private LocalDate slotDate;
+    private LocalTime startTime;
+    private LocalTime endTime;
     private int capacity;
     private int bookedCount;
 
-    public Timeslot(int clinicServiceId, Date slotDate, Time startTime, Time endTime, int capacity, int bookedCount)
-    {
-        this.clinicServiceId = clinicServiceId;
-        this.slotDate = slotDate;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.capacity = capacity;
-        this.bookedCount = bookedCount;
-    }
-
-    public Timeslot(int id, int clinicServiceId, Date slotDate, Time startTime, Time endTime, int capacity, int bookedCount)
+    public Timeslot(int id, int clinicServiceId, LocalDate slotDate, LocalTime startTime, LocalTime endTime, int capacity, int bookedCount)
     {
         this.id = id;
         this.clinicServiceId = clinicServiceId;
@@ -56,32 +46,32 @@ public class Timeslot
         this.clinicServiceId = clinicServiceId;
     }
 
-    public Date getSlotDate()
+    public LocalDate getSlotDate()
     {
         return slotDate;
     }
 
-    public void setSlotDate(Date slotDate)
+    public void setSlotDate(LocalDate slotDate)
     {
         this.slotDate = slotDate;
     }
 
-    public Time getStartTime()
+    public LocalTime getStartTime()
     {
         return startTime;
     }
 
-    public void setStartTime(Time startTime)
+    public void setStartTime(LocalTime startTime)
     {
         this.startTime = startTime;
     }
 
-    public Time getEndTime()
+    public LocalTime getEndTime()
     {
         return endTime;
     }
 
-    public void setEndTime(Time endTime)
+    public void setEndTime(LocalTime endTime)
     {
         this.endTime = endTime;
     }
@@ -111,9 +101,9 @@ public class Timeslot
         return new Timeslot(
                 rs.getInt("id"),
                 rs.getInt("clinic_service_id"),
-                rs.getDate("slot_date"),
-                rs.getTime("start_time"),
-                rs.getTime("end_time"),
+                rs.getObject("slot_date", LocalDate.class),
+                rs.getObject("start_time", LocalTime.class),
+                rs.getObject("end_time", LocalTime.class),
                 rs.getInt("capacity"),
                 rs.getInt("booked_count"));
     }

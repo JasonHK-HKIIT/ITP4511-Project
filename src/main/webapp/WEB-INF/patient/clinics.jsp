@@ -30,9 +30,7 @@
             <details>
                 <summary><strong>${clinic.location}</strong></summary>
                 <p>
-                    <fmt:formatDate value="${clinic.openingTime}" type="time" timeStyle="short" var="openingTime" />
-                    <fmt:formatDate value="${clinic.closingTime}" type="time" timeStyle="short" var="closingTime" />
-                    <strong>Opening hours:</strong> ${openingTime} &ndash; ${closingTime}
+                    <strong>Opening hours:</strong> ${clinic.openingTime} &ndash; ${clinic.closingTime}
                 </p>
                 <p>
                     <strong>Services:</strong>
