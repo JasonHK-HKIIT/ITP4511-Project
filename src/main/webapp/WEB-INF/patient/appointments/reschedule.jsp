@@ -12,7 +12,7 @@
 <html>
 <head>
     <title>Reschedule Appointment</title>
-    <link rel="stylesheet" href="/css/pico.slate.min.css">
+    <link rel="stylesheet" href="/css/pico.jade.min.css">
 </head>
 <body>
     <jsp:include page="/WEB-INF/includes/header.jsp">

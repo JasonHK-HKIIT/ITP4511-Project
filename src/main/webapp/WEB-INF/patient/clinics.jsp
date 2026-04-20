@@ -6,7 +6,7 @@
 <html lang="en">
 <head>
     <title>Clinics</title>
-    <link rel="stylesheet" href="/css/pico.slate.min.css">
+    <link rel="stylesheet" href="/css/pico.jade.min.css">
     <style>
         details > :not(summary)
         {

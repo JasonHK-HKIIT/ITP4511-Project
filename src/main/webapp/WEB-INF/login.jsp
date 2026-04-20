@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Login</title>
-    <link rel="stylesheet" href="/css/pico.slate.min.css">
+    <link rel="stylesheet" href="/css/pico.jade.min.css">
 </head>
 <body>
     <header class="container">
