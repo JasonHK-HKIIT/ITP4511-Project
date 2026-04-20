@@ -311,6 +311,54 @@ public class Database
         catch (SQLException e) { throw new RuntimeException(e); }
     }
 
+    public void cancelAppointmentByPatient(int id, User patient)
+    {
+        cancelAppointmentByPatient(id, patient.getId());
+    }
+
+    public void cancelAppointmentByPatient(int id, int patientId)
+    {
+        try (var c = getConnection())
+        {
+            c.setAutoCommit(false);
+
+            int timeslotId;
+            try (var ps = c.prepareStatement("SELECT timeslot_id FROM appointments WHERE id = ? AND patient_id = ?"))
+            {
+                ps.setInt(1, id);
+                ps.setInt(2, patientId);
+
+                var rs = ps.executeQuery();
+                if (!rs.next()) { throw new IllegalStateException(String.format("Failed to query appointment #%d", id)); }
+
+                timeslotId = rs.getInt("timeslot_id");
+            }
+            catch (SQLException | IllegalStateException e)
+            {
+                c.rollback();
+                throw e;
+            }
+
+            try (var ps = c.prepareStatement("UPDATE appointments SET status = 'CANCELLED', cancel_reason = 'Cancelled by patient' WHERE id = ?"))
+            {
+                ps.setInt(1, id);
+
+                var affectedRows = ps.executeUpdate();
+                if (affectedRows == 0) { throw new IllegalStateException(String.format("Failed to update timeslot #%s", timeslotId)); }
+            }
+            catch (SQLException | IllegalStateException e)
+            {
+                c.rollback();
+                throw e;
+            }
+
+            updateBookedCountForTimeslot(c, timeslotId, -1);
+
+            c.commit();
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+    }
+
     private void updateBookedCountForTimeslot(Connection c, int timeslotId, int delta) throws SQLException
     {
         try (var ps = c.prepareStatement("UPDATE timeslots SET booked_count = booked_count + ? WHERE id = ?"))

@@ -27,7 +27,7 @@
     <main class="container">
         <h1>Appointments</h1>
 
-        <table id="appointments">
+        <table>
             <thead>
                 <tr>
                     <th scope="col">Date</th>
@@ -59,25 +59,82 @@
                                 <c:when test="${appointment.status.name() == 'ARRIVED'}">Arrived</c:when>
                                 <c:when test="${appointment.status.name() == 'COMPLETED'}">Completed</c:when>
                                 <c:when test="${appointment.status.name() == 'NO_SHOW'}">No Show</c:when>
-                                <c:when test="${appointment.status.name() == 'CANCELLED'}">Cancelled</c:when>
+                                <c:when test="${appointment.status.name() == 'CANCELLED'}">
+                                    <span data-tooltip="${appointment.cancelReason}">Cancelled</span>
+                                </c:when>
                             </c:choose>
                         </td>
                         <td>
-                            <c:url value="/appointments" var="rescheduleAppointment">
-                                <c:param name="action" value="reschedule" />
-                                <c:param name="id" value="${appointment.id}" />
-                            </c:url>
-                            <a href="${rescheduleAppointment}">[Reschedule]</a>
-                            <c:url value="/appointments" var="cancelAppointment">
-                                <c:param name="action" value="cancel" />
-                                <c:param name="id" value="${appointment.id}" />
-                            </c:url>
-                            <a href="${cancelAppointment}">[Cancel]</a>
+                            <c:if test="${appointment.status.ordinal() < 2}">
+                                <c:url value="/appointments" var="rescheduleAppointment">
+                                    <c:param name="action" value="reschedule" />
+                                    <c:param name="id" value="${appointment.id}" />
+                                </c:url>
+                                <a href="${rescheduleAppointment}">[Reschedule]</a>
+                                <a href data-action="cancel" data-id="${appointment.id}"
+                                   data-date="${timeslot.slotDate}"
+                                   data-time="${timeslot.startTime}"
+                                   data-location="${clinics.get(clinicService.clinicId).location}"
+                                   data-service="${services.get(clinicService.serviceId).name}"
+                                >
+                                    [Cancel]
+                                </a>
+                            </c:if>
                         </td>
                     </tr>
                 </c:forEach>
             </tbody>
         </table>
     </main>
+
+    <dialog data-type="cancel">
+        <article>
+            <h2>Cancel Appointment</h2>
+            <p>
+                Are you sure to cancel your appointment below?
+            </p>
+            <ul>
+                <li>Date: <span data-key="date"></span></li>
+                <li>Time: <span data-key="time"></span></li>
+                <li>Clinic: <span data-key="location"></span></li>
+                <li>Service: <span data-key="service"></span></li>
+            </ul>
+            <footer>
+                <button class="secondary">No</button>
+                <button>Yes</button>
+            </footer>
+        </article>
+    </dialog>
+
+    <script>
+        /** @type {HTMLDialogElement} */
+        const cancelDialog = document.querySelector("dialog[data-type=cancel]");
+        cancelDialog.querySelector("button.secondary").addEventListener("click", () => cancelDialog.close("No"));
+        cancelDialog.querySelector("button:not(.secondary)").addEventListener("click", () => cancelDialog.close("Yes"));
+
+        document.querySelectorAll("[data-action=cancel]").forEach((target) =>
+        {
+            target.addEventListener("click", (event) =>
+            {
+                event.preventDefault();
+
+                for (const key of Object.keys(target.dataset))
+                {
+                    const placeholder = cancelDialog.querySelector(`[data-key="\${key}"]`);
+                    if (placeholder) { placeholder.textContent = target.dataset[key]; }
+                }
+
+                cancelDialog.addEventListener("close", async () =>
+                {
+                    if (cancelDialog.returnValue === "Yes")
+                    {
+                        const response = await fetch(`/appointments?action=cancel&id=\${target.dataset.id}`, { method: "POST" });
+                        if (response.ok) { location.reload(); }
+                    }
+                }, { once: true });
+                cancelDialog.showModal();
+            });
+        });
+    </script>
 </body>
 </html>
