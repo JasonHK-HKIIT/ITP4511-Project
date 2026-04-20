@@ -39,6 +39,11 @@
                 </tr>
             </thead>
             <tbody>
+                <c:if test="${empty appointments}">
+                    <tr>
+                        <td colspan="6" style="text-align: center">No records.</td>
+                    </tr>
+                </c:if>
                 <c:forEach items="${appointments}" var="appointment">
                     <tr>
                         <c:set var="timeslot" value="${timeslots.get(appointment.timeslotId)}" />
