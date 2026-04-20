@@ -43,7 +43,7 @@
                 <label>
                     Timeslot
                     <select id="timeslot" name="timeslot" required>
-                        <jsp:include page="book-timeslots.jsp">
+                        <jsp:include page="timeslots.jsp">
                             <jsp:param name="timeslotId" value="${timeslot.id}"/>
                         </jsp:include>
                     </select>
@@ -60,7 +60,7 @@
 
         dateField.addEventListener("change", async () =>
         {
-            const response = await fetch(`/appointments?action=fetch&type=timeslots&service=${clinicService.id}&date=\${dateField.value}`);
+            const response = await fetch(`/appointments?action=timeslots&service=${clinicService.id}&date=\${dateField.value}`);
             timeslotField.innerHTML = await response.text();
         });
     </script>
