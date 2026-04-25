@@ -45,4 +45,30 @@ public class QueuesController extends Controller
             default -> response.sendError(HttpServletResponse.SC_BAD_REQUEST, String.format("Action %s is not supported", action));
         }
     }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+        var action = Objects.requireNonNullElse(request.getParameter("action"), "list").toLowerCase();
+        switch (action)
+        {
+            case "join" ->
+            {
+                var user = getCurrentUser(request);
+                var id = Integer.parseInt(request.getParameter("service"));
+                database.joinQueue(user, id);
+
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            }
+            case "leave" ->
+            {
+                var user = getCurrentUser(request);
+                var id = Integer.parseInt(request.getParameter("id"));
+                database.leaveQueueByPatient(id, user);
+
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            }
+            default -> response.sendError(HttpServletResponse.SC_BAD_REQUEST, String.format("Action %s is not supported", action));
+        }
+    }
 }

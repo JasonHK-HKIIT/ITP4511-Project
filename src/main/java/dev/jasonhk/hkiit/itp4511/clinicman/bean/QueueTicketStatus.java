@@ -6,5 +6,5 @@ public enum QueueTicketStatus
     CALLED,
     COMPLETED,
     SKIPPED,
-    CANCELLED,
+    LEFT,
 }

@@ -401,6 +401,11 @@ public class Database
         return appointments;
     }
 
+    public QueueTicket joinQueue(User patient, int clinicServiceId)
+    {
+        return joinQueue(patient.getId(), clinicServiceId);
+    }
+
     public QueueTicket joinQueue(int patientId, int clinicServiceId)
     {
         var today = LocalDate.now();
@@ -460,6 +465,25 @@ public class Database
                 c.rollback();
                 throw e;
             }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+    }
+
+    public void leaveQueueByPatient(int id, User patient)
+    {
+        leaveQueueByPatient(id, patient.getId());
+    }
+
+    public void leaveQueueByPatient(int id, int patientId)
+    {
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("UPDATE queue_tickets SET status = 'LEFT' WHERE id = ? AND patient_id = ?");
+            ps.setInt(1, id);
+            ps.setInt(2, patientId);
+
+            var affectedRows = ps.executeUpdate();
+            if (affectedRows == 0) { throw new IllegalStateException(String.format("Failed to update queue ticket #%s", id)); }
         }
         catch (SQLException e) { throw new RuntimeException(e); }
     }

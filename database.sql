@@ -274,7 +274,7 @@ CREATE TABLE queue_tickets
     clinic_service_id      INT      NOT NULL,
     queue_date             DATE     NOT NULL,
     queue_number           INT      NOT NULL,
-    status                 ENUM('WAITING', 'CALLED', 'COMPLETED', 'SKIPPED', 'CANCELLED') NOT NULL DEFAULT 'WAITING',
+    status                 ENUM('WAITING', 'CALLED', 'COMPLETED', 'SKIPPED', 'LEFT') NOT NULL DEFAULT 'WAITING',
     estimated_wait_minutes INT      NOT NULL DEFAULT 0,
     joined_at              DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     called_at              DATETIME NULL,

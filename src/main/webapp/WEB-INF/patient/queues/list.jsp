@@ -12,7 +12,7 @@
     <title>Queues</title>
     <link rel="stylesheet" href="/css/pico.jade.min.css">
     <style>
-        #appointments td:nth-child(3)
+        #appointments td:nth-child(2)
         {
             white-space: nowrap;
         }
@@ -52,22 +52,21 @@
                         <td>${ticket.formatTicketNumber()}</td>
                         <td>
                             <c:choose>
-                                <c:when test="${appointment.status.name() == 'WAITING'}">Waiting</c:when>
-                                <c:when test="${appointment.status.name() == 'CALLED'}">Called</c:when>
-                                <c:when test="${appointment.status.name() == 'COMPLETED'}">Completed</c:when>
-                                <c:when test="${appointment.status.name() == 'SKIPPED'}">Skipped</c:when>
-                                <c:when test="${appointment.status.name() == 'CANCELLED'}">Cancelled</c:when>
+                                <c:when test="${ticket.status.name() == 'WAITING'}">Waiting</c:when>
+                                <c:when test="${ticket.status.name() == 'CALLED'}">Called</c:when>
+                                <c:when test="${ticket.status.name() == 'COMPLETED'}">Completed</c:when>
+                                <c:when test="${ticket.status.name() == 'SKIPPED'}">Skipped</c:when>
+                                <c:when test="${ticket.status.name() == 'LEFT'}">Left</c:when>
                             </c:choose>
                         </td>
                         <td>
-                            <c:if test="${appointment.status.ordinal() < 1}">
-                                <a href data-action="cancel" data-id="${ticket.id}"
-                                   data-date="${ticket.queueDate}"
+                            <c:if test="${ticket.status.ordinal() < 1}">
+                                <a href data-action="leave" data-id="${ticket.id}"
                                    data-location="${clinics.get(clinicService.clinicId).location}"
                                    data-service="${services.get(clinicService.serviceId).name}"
                                    data-number="${ticket.formatTicketNumber()}"
                                 >
-                                    [Cancel]
+                                    [Leave]
                                 </a>
                             </c:if>
                         </td>
@@ -77,15 +76,13 @@
         </table>
     </main>
 
-    <dialog data-type="cancel">
+    <dialog data-type="leave">
         <article>
-            <h2>Cancel Appointment</h2>
+            <h2>Leave Queue</h2>
             <p>
-                Are you sure to cancel your appointment below?
+                Are you sure to leave the queue below?
             </p>
             <ul>
-                <li>Date: <span data-key="date"></span></li>
-                <li>Time: <span data-key="time"></span></li>
                 <li>Clinic: <span data-key="location"></span></li>
                 <li>Service: <span data-key="service"></span></li>
             </ul>
@@ -98,11 +95,11 @@
 
     <script>
         /** @type {HTMLDialogElement} */
-        const cancelDialog = document.querySelector("dialog[data-type=cancel]");
-        cancelDialog.querySelector("button.secondary").addEventListener("click", () => cancelDialog.close("No"));
-        cancelDialog.querySelector("button:not(.secondary)").addEventListener("click", () => cancelDialog.close("Yes"));
+        const leaveDialog = document.querySelector("dialog[data-type=leave]");
+        leaveDialog.querySelector("button.secondary").addEventListener("click", () => leaveDialog.close("No"));
+        leaveDialog.querySelector("button:not(.secondary)").addEventListener("click", () => leaveDialog.close("Yes"));
 
-        document.querySelectorAll("[data-action=cancel]").forEach((target) =>
+        document.querySelectorAll("[data-action=leave]").forEach((target) =>
         {
             target.addEventListener("click", (event) =>
             {
@@ -110,19 +107,19 @@
 
                 for (const key of Object.keys(target.dataset))
                 {
-                    const placeholder = cancelDialog.querySelector(`[data-key="\${key}"]`);
+                    const placeholder = leaveDialog.querySelector(`[data-key="\${key}"]`);
                     if (placeholder) { placeholder.textContent = target.dataset[key]; }
                 }
 
-                cancelDialog.addEventListener("close", async () =>
+                leaveDialog.addEventListener("close", async () =>
                 {
-                    if (cancelDialog.returnValue === "Yes")
+                    if (leaveDialog.returnValue === "Yes")
                     {
-                        const response = await fetch(`/appointments?action=cancel&id=\${target.dataset.id}`, { method: "POST" });
+                        const response = await fetch(`/queues?action=leave&id=\${target.dataset.id}`, { method: "POST" });
                         if (response.ok) { location.reload(); }
                     }
                 }, { once: true });
-                cancelDialog.showModal();
+                leaveDialog.showModal();
             });
         });
     </script>
