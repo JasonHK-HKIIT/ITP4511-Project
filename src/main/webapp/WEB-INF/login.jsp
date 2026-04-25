@@ -35,6 +35,7 @@
                 </fieldset>
 
                 <button type="submit">Login</button>
+                <a href="/register" role="button" class="secondary" style="width: 100%">Register</a>
             </form>
         <% } %>
     </main>
