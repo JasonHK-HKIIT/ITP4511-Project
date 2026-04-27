@@ -16,8 +16,6 @@ public class HomeController extends HttpServlet implements WithUser
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
-        if (!ensureLoggedIn(request, response)) { return; }
-
         request.getRequestDispatcher("WEB-INF/home.jsp").forward(request, response);
     }
 }
