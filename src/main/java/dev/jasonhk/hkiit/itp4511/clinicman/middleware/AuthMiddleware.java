@@ -31,14 +31,8 @@ public class AuthMiddleware implements Filter, WithUser
 
         switch (requestPath)
         {
-            case "/login":
-            case "/logout":
-            case "/register":
-            {
-                chain.doFilter(req, res);
-                return;
-            }
-            default:
+            case "/login", "/logout", "/register" -> chain.doFilter(req, res);
+            default ->
             {
                 var user = getCurrentUser(request);
                 if (user == null)
@@ -49,7 +43,7 @@ public class AuthMiddleware implements Filter, WithUser
 
                 var isAccessible = switch (requestPath)
                 {
-                    case "/profile" -> true;
+                    case "/", "/profile" -> true;
                     default -> switch (user.getRole())
                     {
                         case PATIENT -> (!requestPath.startsWith("/staff") && !requestPath.startsWith("/admin"));
