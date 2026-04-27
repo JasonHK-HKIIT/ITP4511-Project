@@ -37,7 +37,7 @@ public class LoginController extends Controller
         if (user == null)
         {
             request.setAttribute("isCredentialsError", true);
-            request.getRequestDispatcher("WEB-INF/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
             return;
         }
 

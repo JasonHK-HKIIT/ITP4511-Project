@@ -1,4 +1,4 @@
-package dev.jasonhk.hkiit.itp4511.clinicman.controller;
+package dev.jasonhk.hkiit.itp4511.clinicman.controller.patient;
 
 import java.io.IOException;
 
@@ -16,6 +16,6 @@ public class HomeController extends HttpServlet implements WithUser
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
-        request.getRequestDispatcher("WEB-INF/home.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/patient/home.jsp").forward(request, response);
     }
 }
