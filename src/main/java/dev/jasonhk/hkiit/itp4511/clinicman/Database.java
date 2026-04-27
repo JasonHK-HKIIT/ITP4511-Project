@@ -40,6 +40,40 @@ public class Database
         return connection;
     }
 
+    public User getUserById(int id)
+    {
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("SELECT * FROM users WHERE id = ?");
+            ps.setInt(1, id);
+
+            var rs = ps.executeQuery();
+            if (rs.next()) { return User.from(rs); }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return null;
+    }
+
+    public boolean updateUser(User user)
+    {
+        try (var c = getConnection())
+        {
+            var gender = user.getGender();
+
+            var ps = c.prepareStatement("UPDATE users SET username = ?, full_name = ?, phone = ?, gender = ?, date_of_birth = ? WHERE id = ?");
+            ps.setString(1, user.getUsername());
+            ps.setString(2, user.getFullName());
+            ps.setString(3, user.getPhone());
+            ps.setString(4, (gender != null) ? gender.name() : null);
+            ps.setObject(5, user.getDateOfBirth());
+            ps.setInt(6, user.getId());
+
+            var affectedRows = ps.executeUpdate();
+            return (affectedRows > 0);
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+    }
+
     public User getUserByCredentials(String username, String password)
     {
         try (var c = getConnection())
