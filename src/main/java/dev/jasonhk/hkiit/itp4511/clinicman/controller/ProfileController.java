@@ -33,7 +33,7 @@ public class ProfileController extends Controller
         user.setFullName(request.getParameter("fullName"));
         user.setPhone(request.getParameter("phone"));
         user.setGender(((gender != null) && !gender.isBlank()) ? Gender.valueOf(gender) : null);
-        user.setDateOfBirth((dateOfBirth != null) ? LocalDate.parse(dateOfBirth) : null);
+        user.setDateOfBirth(((dateOfBirth != null) && !dateOfBirth.isBlank()) ? LocalDate.parse(dateOfBirth) : null);
 
         database.updateUser(user);
         doGet(request, response);
