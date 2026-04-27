@@ -11,7 +11,7 @@
 </head>
 <body>
     <jsp:include page="/WEB-INF/includes/header.jsp">
-        <jsp:param name="type" value="patient" />
+        <jsp:param name="type" value="${user.role.name().toLowerCase()}" />
     </jsp:include>
 
     <main class="container">
@@ -34,7 +34,7 @@
                 <label>
                     Gender
                     <select name="gender">
-                        <option>Unspecified</option>
+                        <option value="">Unspecified</option>
                         <option value="MALE"${(user.gender.name() == 'MALE') ? ' selected' : ''}>Male</option>
                         <option value="FEMALE"${(user.gender.name() == 'FEMALE') ? ' selected' : ''}>Female</option>
                     </select>

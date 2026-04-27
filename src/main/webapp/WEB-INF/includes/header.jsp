@@ -10,9 +10,9 @@
                     <li><a href="/clinics">Clinics</a></li>
                     <li><a href="/appointments">Appointments</a></li>
                     <li><a href="/queues">Queues</a></li>
-                    <li><a href="/profile">Profile</a></li>
                 </c:when>
             </c:choose>
+            <li><a href="/profile">Profile</a></li>
             <li><a href="/logout">Sign Out</a></li>
         </ul>
     </nav>
