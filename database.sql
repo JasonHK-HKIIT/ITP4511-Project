@@ -2,38 +2,7 @@ CREATE DATABASE IF NOT EXISTS itp4511_db;
 USE itp4511_db;
 
 -- =========================
--- 1. USERS
--- =========================
-CREATE TABLE users
-(
-    id            INT AUTO_INCREMENT PRIMARY KEY,
-    username      VARCHAR(50)  NOT NULL UNIQUE,
-    password      VARCHAR(255) NOT NULL,
-    full_name     VARCHAR(100) NOT NULL,
-    phone         VARCHAR(20) NULL,
-    role          ENUM('PATIENT', 'STAFF', 'ADMIN') NOT NULL,
-    gender        ENUM('MALE', 'FEMALE') NULL,
-    date_of_birth DATE NULL
-);
-
--- Seed 5 default users for development/testing
-INSERT INTO users (username, password, full_name, phone, role, gender, date_of_birth)
-VALUES
-    ('admin1', 'admin123', 'Admin User', '90000001', 'ADMIN', 'MALE', '1988-01-15'),
-    ('staff1', 'staff123', 'Staff User', '90000002', 'STAFF', 'FEMALE', '1992-06-20'),
-    ('patient1', 'patient123', 'Patient One', '90000003', 'PATIENT', 'MALE', '2000-03-10'),
-    ('patient2', 'patient123', 'Patient Two', '90000004', 'PATIENT', 'FEMALE', '2001-09-25'),
-    ('patient3', 'patient123', 'Patient Three', '90000005', 'PATIENT', 'MALE', '1999-12-05')
-ON DUPLICATE KEY UPDATE
-    password = VALUES(password),
-    full_name = VALUES(full_name),
-    phone = VALUES(phone),
-    role = VALUES(role),
-    gender = VALUES(gender),
-    date_of_birth = VALUES(date_of_birth);
-
--- =========================
--- 2. CLINICS
+-- 1. CLINICS
 -- =========================
 CREATE TABLE clinics
 (
@@ -58,6 +27,45 @@ ON DUPLICATE KEY UPDATE
     closing_time = VALUES(closing_time),
     is_walkin_enabled = VALUES(is_walkin_enabled),
     status = VALUES(status);
+
+-- =========================
+-- 2. USERS
+-- =========================
+CREATE TABLE users
+(
+    id            INT AUTO_INCREMENT PRIMARY KEY,
+    username      VARCHAR(50)  NOT NULL UNIQUE,
+    password      VARCHAR(255) NOT NULL,
+    full_name     VARCHAR(100) NOT NULL,
+    phone         VARCHAR(20) NULL,
+    role          ENUM('PATIENT', 'STAFF', 'ADMIN') NOT NULL,
+    clinic_id     INT NULL,
+    gender        ENUM('MALE', 'FEMALE') NULL,
+    date_of_birth DATE NULL,
+
+    INDEX idx_users_clinic_id (clinic_id),
+    CONSTRAINT fk_users_clinic
+        FOREIGN KEY (clinic_id) REFERENCES clinics (id)
+            ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- Seed 5 default users for development/testing
+INSERT INTO users (username, password, full_name, phone, role, clinic_id, gender, date_of_birth)
+VALUES
+    ('admin1', 'admin123', 'Admin User', '90000001', 'ADMIN', NULL, 'MALE', '1988-01-15'),
+    ('staff1', 'staff123', 'Staff User', '90000002', 'STAFF', 1, 'FEMALE', '1992-06-20'),
+    ('patient1', 'patient123', 'Patient One', '90000003', 'PATIENT', NULL, 'MALE', '2000-03-10'),
+    ('patient2', 'patient123', 'Patient Two', '90000004', 'PATIENT', NULL, 'FEMALE', '2001-09-25'),
+    ('patient3', 'patient123', 'Patient Three', '90000005', 'PATIENT', NULL, 'MALE', '1999-12-05')
+    ON DUPLICATE KEY UPDATE
+                         password = VALUES(password),
+                         full_name = VALUES(full_name),
+                         phone = VALUES(phone),
+                         role = VALUES(role),
+                         clinic_id = VALUES(clinic_id),
+                         gender = VALUES(gender),
+                         date_of_birth = VALUES(date_of_birth);
+
 
 -- =========================
 -- 3. SERVICES
@@ -244,7 +252,25 @@ CREATE TABLE appointments
 -- Helps reduce accidental double-booking checks per patient and slot
 CREATE UNIQUE INDEX uq_patient_timeslot ON appointments (patient_id, timeslot_id);
 
--- Add Here!
+-- Seed 2 appointments using fixed IDs from this seed order:
+-- users: patient1=3, patient2=4; timeslots: today 09:00 (clinic_service_id 1)=1, tomorrow 09:00 (clinic_service_id 2)=33
+INSERT INTO appointments (patient_id, timeslot_id, status, approval_status, booked_at, cancel_reason)
+VALUES
+    (3, 1, 'CONFIRMED', 'NOT_REQUIRED', NOW(), NULL),
+    (4, 33, 'PENDING', 'NOT_REQUIRED', NOW(), NULL)
+ON DUPLICATE KEY UPDATE
+    status = VALUES(status),
+    approval_status = VALUES(approval_status),
+    cancel_reason = VALUES(cancel_reason);
+
+-- Keep booked_count aligned for the seeded slots
+UPDATE timeslots
+SET booked_count = CASE
+    WHEN id = 1 THEN 1
+    WHEN id = 33 THEN 1
+    ELSE booked_count
+END
+WHERE id IN (1, 33);
 
 -- =========================
 -- 7. QUEUES
@@ -319,29 +345,7 @@ CREATE TABLE notifications
 );
 
 -- =========================
--- 10. STAFF_CLINIC_ASSIGNMENTS
--- =========================
-CREATE TABLE staff_clinic_assignments
-(
-    assignment_id INT AUTO_INCREMENT PRIMARY KEY,
-    staff_user_id INT      NOT NULL,
-    clinic_id     INT      NOT NULL,
-    assigned_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    status        ENUM('ACTIVE', 'INACTIVE') NOT NULL DEFAULT 'ACTIVE',
-
-    CONSTRAINT fk_staff_assignment_user
-        FOREIGN KEY (staff_user_id) REFERENCES users (id)
-            ON DELETE CASCADE ON UPDATE CASCADE,
-
-    CONSTRAINT fk_staff_assignment_clinic
-        FOREIGN KEY (clinic_id) REFERENCES clinics (id)
-            ON DELETE CASCADE ON UPDATE CASCADE,
-
-    CONSTRAINT uq_staff_clinic UNIQUE (staff_user_id, clinic_id)
-);
-
--- =========================
--- 11. POLICY_SETTINGS
+-- 10. POLICY_SETTINGS
 -- =========================
 CREATE TABLE policy_settings
 (

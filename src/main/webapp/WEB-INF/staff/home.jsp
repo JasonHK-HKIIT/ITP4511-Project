@@ -12,20 +12,11 @@
 </head>
 <body>
     <jsp:include page="/WEB-INF/includes/header.jsp">
-        <jsp:param name="type" value="patient" />
+        <jsp:param name="type" value="staff" />
     </jsp:include>
 
     <main class="container">
         <h1>Welcome, ${user.fullName}</h1>
-
-        <section>
-            <h2>Notifications</h2>
-            <article>
-                <header>Header</header>
-                Body
-                <footer>Footer</footer>
-            </article>
-        </section>
     </main>
 </body>
 </html>
