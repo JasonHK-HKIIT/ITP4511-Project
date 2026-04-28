@@ -77,35 +77,10 @@
         </article>
     </dialog>
 
-    <script>
-        /** @type {HTMLDialogElement} */
-        const queueDialog = document.querySelector("dialog[data-type=queue]");
-        queueDialog.querySelector("button.secondary").addEventListener("click", () => queueDialog.close("No"));
-        queueDialog.querySelector("button:not(.secondary)").addEventListener("click", () => queueDialog.close("Yes"));
+    <script type="module">
+        import { initializeDialog } from "/js/dialog-helpers.js";
 
-        document.querySelectorAll("[data-action=queue]").forEach((target) =>
-        {
-            target.addEventListener("click", (event) =>
-            {
-                event.preventDefault();
-
-                for (const key of Object.keys(target.dataset))
-                {
-                    const placeholder = queueDialog.querySelector(`[data-key="\${key}"]`);
-                    if (placeholder) { placeholder.textContent = target.dataset[key]; }
-                }
-
-                queueDialog.addEventListener("close", async () =>
-                {
-                    if (queueDialog.returnValue === "Yes")
-                    {
-                        const response = await fetch(`/queues?action=join&service=\${target.dataset.id}`, { method: "POST" });
-                        if (response.ok) { location.pathname = "/queues"; }
-                    }
-                }, { once: true });
-                queueDialog.showModal();
-            });
-        });
+        initializeDialog(document.querySelector("dialog[data-type=queue]"), "/queues?action=join&service={id}", () => { location.pathname = "/queues"; });
     </script>
 </body>
 </html>

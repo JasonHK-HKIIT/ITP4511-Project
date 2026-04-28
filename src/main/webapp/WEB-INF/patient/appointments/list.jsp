@@ -106,35 +106,10 @@
         </article>
     </dialog>
 
-    <script>
-        /** @type {HTMLDialogElement} */
-        const cancelDialog = document.querySelector("dialog[data-type=cancel]");
-        cancelDialog.querySelector("button.secondary").addEventListener("click", () => cancelDialog.close("No"));
-        cancelDialog.querySelector("button:not(.secondary)").addEventListener("click", () => cancelDialog.close("Yes"));
+    <script type="module">
+        import { initializeDialog } from "/js/dialog-helpers.js";
 
-        document.querySelectorAll("[data-action=cancel]").forEach((target) =>
-        {
-            target.addEventListener("click", (event) =>
-            {
-                event.preventDefault();
-
-                for (const key of Object.keys(target.dataset))
-                {
-                    const placeholder = cancelDialog.querySelector(`[data-key="\${key}"]`);
-                    if (placeholder) { placeholder.textContent = target.dataset[key]; }
-                }
-
-                cancelDialog.addEventListener("close", async () =>
-                {
-                    if (cancelDialog.returnValue === "Yes")
-                    {
-                        const response = await fetch(`/appointments?action=cancel&id=\${target.dataset.id}`, { method: "POST" });
-                        if (response.ok) { location.reload(); }
-                    }
-                }, { once: true });
-                cancelDialog.showModal();
-            });
-        });
+        initializeDialog(document.querySelector("dialog[data-type=cancel]"), "/appointments?action=cancel&id={id}", () => location.reload());
     </script>
 </body>
 </html>

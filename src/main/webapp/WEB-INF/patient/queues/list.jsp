@@ -93,35 +93,10 @@
         </article>
     </dialog>
 
-    <script>
-        /** @type {HTMLDialogElement} */
-        const leaveDialog = document.querySelector("dialog[data-type=leave]");
-        leaveDialog.querySelector("button.secondary").addEventListener("click", () => leaveDialog.close("No"));
-        leaveDialog.querySelector("button:not(.secondary)").addEventListener("click", () => leaveDialog.close("Yes"));
+    <script type="module">
+        import { initializeDialog } from "/js/dialog-helpers.js";
 
-        document.querySelectorAll("[data-action=leave]").forEach((target) =>
-        {
-            target.addEventListener("click", (event) =>
-            {
-                event.preventDefault();
-
-                for (const key of Object.keys(target.dataset))
-                {
-                    const placeholder = leaveDialog.querySelector(`[data-key="\${key}"]`);
-                    if (placeholder) { placeholder.textContent = target.dataset[key]; }
-                }
-
-                leaveDialog.addEventListener("close", async () =>
-                {
-                    if (leaveDialog.returnValue === "Yes")
-                    {
-                        const response = await fetch(`/queues?action=leave&id=\${target.dataset.id}`, { method: "POST" });
-                        if (response.ok) { location.reload(); }
-                    }
-                }, { once: true });
-                leaveDialog.showModal();
-            });
-        });
+        initializeDialog(document.querySelector("dialog[data-type=leave]"), "/queues?action=leave&id={id}", () => location.reload());
     </script>
 </body>
 </html>
