@@ -1,7 +1,6 @@
 package dev.jasonhk.hkiit.itp4511.clinicman.controller.patient;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;

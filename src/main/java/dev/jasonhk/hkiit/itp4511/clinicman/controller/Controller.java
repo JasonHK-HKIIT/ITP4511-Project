@@ -1,11 +1,12 @@
 package dev.jasonhk.hkiit.itp4511.clinicman.controller;
 
-import dev.jasonhk.hkiit.itp4511.clinicman.Database;
-import dev.jasonhk.hkiit.itp4511.clinicman.mixin.WithDatabase;
-import dev.jasonhk.hkiit.itp4511.clinicman.mixin.WithUser;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
+
+import dev.jasonhk.hkiit.itp4511.clinicman.Database;
+import dev.jasonhk.hkiit.itp4511.clinicman.mixin.WithDatabase;
+import dev.jasonhk.hkiit.itp4511.clinicman.mixin.WithUser;
 
 public class Controller extends HttpServlet implements WithDatabase, WithUser
 {

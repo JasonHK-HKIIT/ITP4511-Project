@@ -1,9 +1,6 @@
 package dev.jasonhk.hkiit.itp4511.clinicman.mixin;
 
-import java.io.IOException;
-
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import dev.jasonhk.hkiit.itp4511.clinicman.bean.User;
 

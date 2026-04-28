@@ -9,7 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.*;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.Appointment;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.Clinic;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.ClinicService;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.QueueTicket;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.Service;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.Timeslot;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.User;
 
 public class Database
 {

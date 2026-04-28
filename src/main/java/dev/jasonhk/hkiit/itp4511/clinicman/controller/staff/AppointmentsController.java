@@ -6,12 +6,17 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.AppointmentStatus;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.Clinic;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.ClinicService;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.Service;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.Timeslot;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.User;
 import dev.jasonhk.hkiit.itp4511.clinicman.controller.Controller;
 
 @WebServlet("/staff/appointments")
