@@ -52,15 +52,15 @@
                         <td>${ticket.formatTicketNumber()}</td>
                         <td>
                             <c:choose>
-                                <c:when test="${ticket.status.name() == 'WAITING'}">Waiting</c:when>
-                                <c:when test="${ticket.status.name() == 'CALLED'}">Called</c:when>
-                                <c:when test="${ticket.status.name() == 'COMPLETED'}">Completed</c:when>
-                                <c:when test="${ticket.status.name() == 'SKIPPED'}">Skipped</c:when>
-                                <c:when test="${ticket.status.name() == 'LEFT'}">Left</c:when>
+                                <c:when test="${ticket.status == 'WAITING'}">Waiting</c:when>
+                                <c:when test="${ticket.status == 'CALLED'}">Called</c:when>
+                                <c:when test="${ticket.status == 'COMPLETED'}">Completed</c:when>
+                                <c:when test="${ticket.status == 'SKIPPED'}">Skipped</c:when>
+                                <c:when test="${ticket.status == 'LEFT'}">Left</c:when>
                             </c:choose>
                         </td>
                         <td>
-                            <c:if test="${ticket.status.ordinal() < 1}">
+                            <c:if test="${ticket.status == 'WAITING'}">
                                 <a href data-action="leave" data-id="${ticket.id}"
                                    data-location="${clinics.get(clinicService.clinicId).location}"
                                    data-service="${services.get(clinicService.serviceId).name}"
