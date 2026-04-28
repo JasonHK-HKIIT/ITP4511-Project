@@ -36,8 +36,6 @@ public class AppointmentsController extends Controller
 
                 var patients = database.getUsers().stream()
                         .collect(Collectors.toMap(User::getId, Function.identity()));
-                var clinics = database.getClinics().stream()
-                        .collect(Collectors.toMap(Clinic::getId, Function.identity()));
                 var services = database.getServices().stream()
                         .collect(Collectors.toMap(Service::getId, Function.identity()));
                 var clinicServices = database.getClinicServices().stream()
@@ -48,7 +46,6 @@ public class AppointmentsController extends Controller
 
                 request.setAttribute("appointments", appointments);
                 request.setAttribute("patients", patients);
-                request.setAttribute("clinics", clinics);
                 request.setAttribute("services", services);
                 request.setAttribute("clinicServices", clinicServices);
                 request.setAttribute("timeslots", timeslots);

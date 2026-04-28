@@ -4,7 +4,6 @@
 
 <jsp:useBean id="appointments" scope="request" type="java.util.List<dev.jasonhk.hkiit.itp4511.clinicman.bean.Appointment>" />
 <jsp:useBean id="patients" scope="request" type="java.util.Map<java.lang.Integer, dev.jasonhk.hkiit.itp4511.clinicman.bean.User>" />
-<jsp:useBean id="clinics" scope="request" type="java.util.Map<java.lang.Integer, dev.jasonhk.hkiit.itp4511.clinicman.bean.Clinic>" />
 <jsp:useBean id="services" scope="request" type="java.util.Map<java.lang.Integer, dev.jasonhk.hkiit.itp4511.clinicman.bean.Service>" />
 <jsp:useBean id="clinicServices" scope="request" type="java.util.Map<java.lang.Integer, dev.jasonhk.hkiit.itp4511.clinicman.bean.ClinicService>" />
 <jsp:useBean id="timeslots" scope="request" type="java.util.Map<java.lang.Integer, dev.jasonhk.hkiit.itp4511.clinicman.bean.Timeslot>" />
@@ -74,7 +73,6 @@
                                         <a href data-action="confirm" data-id="${appointment.id}"
                                            data-date="${timeslot.slotDate}"
                                            data-time="${timeslot.startTime}"
-                                           data-location="${clinics.get(clinicService.clinicId).location}"
                                            data-service="${services.get(clinicService.serviceId).name}"
                                            data-patient="${patients.get(appointment.patientId).fullName}"
                                         >
@@ -85,7 +83,6 @@
                                         <a href data-action="cancel" data-id="${appointment.id}"
                                            data-date="${timeslot.slotDate}"
                                            data-time="${timeslot.startTime}"
-                                           data-location="${clinics.get(clinicService.clinicId).location}"
                                            data-service="${services.get(clinicService.serviceId).name}"
                                            data-patient="${patients.get(appointment.patientId).fullName}"
                                         >
@@ -98,7 +95,6 @@
                                         <a href data-action="check-in" data-id="${appointment.id}"
                                            data-date="${timeslot.slotDate}"
                                            data-time="${timeslot.startTime}"
-                                           data-location="${clinics.get(clinicService.clinicId).location}"
                                            data-service="${services.get(clinicService.serviceId).name}"
                                            data-patient="${patients.get(appointment.patientId).fullName}"
                                         >
@@ -107,7 +103,6 @@
                                         <a href data-action="no-show" data-id="${appointment.id}"
                                            data-date="${timeslot.slotDate}"
                                            data-time="${timeslot.startTime}"
-                                           data-location="${clinics.get(clinicService.clinicId).location}"
                                            data-service="${services.get(clinicService.serviceId).name}"
                                            data-patient="${patients.get(appointment.patientId).fullName}"
                                         >
@@ -118,7 +113,6 @@
                                         <a href data-action="complete" data-id="${appointment.id}"
                                            data-date="${timeslot.slotDate}"
                                            data-time="${timeslot.startTime}"
-                                           data-location="${clinics.get(clinicService.clinicId).location}"
                                            data-service="${services.get(clinicService.serviceId).name}"
                                            data-patient="${patients.get(appointment.patientId).fullName}"
                                         >
@@ -163,7 +157,6 @@
             <ul>
                 <li>Date: <span data-key="date"></span></li>
                 <li>Time: <span data-key="time"></span></li>
-                <li>Clinic: <span data-key="location"></span></li>
                 <li>Service: <span data-key="service"></span></li>
                 <li>Patient: <span data-key="patient"></span></li>
             </ul>
@@ -183,7 +176,6 @@
             <ul>
                 <li>Date: <span data-key="date"></span></li>
                 <li>Time: <span data-key="time"></span></li>
-                <li>Clinic: <span data-key="location"></span></li>
                 <li>Service: <span data-key="service"></span></li>
                 <li>Patient: <span data-key="patient"></span></li>
             </ul>
@@ -203,7 +195,6 @@
             <ul>
                 <li>Date: <span data-key="date"></span></li>
                 <li>Time: <span data-key="time"></span></li>
-                <li>Clinic: <span data-key="location"></span></li>
                 <li>Service: <span data-key="service"></span></li>
                 <li>Patient: <span data-key="patient"></span></li>
             </ul>
@@ -223,7 +214,6 @@
             <ul>
                 <li>Date: <span data-key="date"></span></li>
                 <li>Time: <span data-key="time"></span></li>
-                <li>Clinic: <span data-key="location"></span></li>
                 <li>Service: <span data-key="service"></span></li>
                 <li>Patient: <span data-key="patient"></span></li>
             </ul>
