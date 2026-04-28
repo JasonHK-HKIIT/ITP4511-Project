@@ -12,6 +12,7 @@ public class User
     private String fullName;
     private String phone;
     private Role role;
+    private Integer clinicId;
     private Gender gender;
     private LocalDate dateOfBirth;
 
@@ -22,13 +23,14 @@ public class User
         this.role = role;
     }
 
-    public User(int id, String username, String fullName, String phone, Role role, Gender gender, LocalDate dateOfBirth)
+    public User(int id, String username, String fullName, String phone, Role role, Integer clinicId, Gender gender, LocalDate dateOfBirth)
     {
         this.id = id;
         this.username = username;
         this.fullName = fullName;
         this.phone = phone;
         this.role = role;
+        this.clinicId = clinicId;
         this.gender = gender;
         this.dateOfBirth = dateOfBirth;
     }
@@ -78,6 +80,16 @@ public class User
         return role;
     }
 
+    public Integer getClinicId()
+    {
+        return clinicId;
+    }
+
+    public void setClinicId(Integer clinicId)
+    {
+        this.clinicId = clinicId;
+    }
+
     public void setRole(Role role)
     {
         this.role = role;
@@ -112,6 +124,7 @@ public class User
                 rs.getString("full_name"),
                 rs.getString("phone"),
                 Role.valueOf(rs.getString("role")),
+                rs.getObject("clinic_id", Integer.class),
                 (gender != null) ? Gender.valueOf(gender) : null,
                 rs.getObject("date_of_birth", LocalDate.class));
     }

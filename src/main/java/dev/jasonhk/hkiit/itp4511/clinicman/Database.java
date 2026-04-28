@@ -7,6 +7,7 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import dev.jasonhk.hkiit.itp4511.clinicman.bean.*;
 
@@ -87,6 +88,36 @@ public class Database
         }
         catch (SQLException e) { throw new RuntimeException(e); }
         return null;
+    }
+
+    public List<User> getUsers()
+    {
+        var users = new ArrayList<User>();
+
+        try (var c = getConnection())
+        {
+            var s = c.createStatement();
+            var rs = s.executeQuery("SELECT * FROM users");
+            while (rs.next()) { users.add(User.from(rs)); }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return users;
+    }
+
+    public List<User> getUsersByIds(List<Integer> ids)
+    {
+        var users = new ArrayList<User>();
+
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("SELECT * FROM users WHERE id IN (?)");
+            ps.setObject(1, ids.toArray());
+
+            var rs = ps.executeQuery();
+            while (rs.next()) { users.add(User.from(rs)); }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return users;
     }
 
     public Clinic getClinicById(int id)
@@ -396,6 +427,47 @@ public class Database
         catch (SQLException e) { throw new RuntimeException(e); }
     }
 
+    public void cancelAppointmentByStaff(int id, String cancelReason)
+    {
+        try (var c = getConnection(false))
+        {
+            int timeslotId;
+            try (var ps = c.prepareStatement("SELECT timeslot_id FROM appointments WHERE id = ?"))
+            {
+                ps.setInt(1, id);
+
+                var rs = ps.executeQuery();
+                if (!rs.next()) { throw new IllegalStateException(String.format("Failed to query appointment #%d", id)); }
+
+                timeslotId = rs.getInt("timeslot_id");
+            }
+            catch (SQLException | IllegalStateException e)
+            {
+                c.rollback();
+                throw e;
+            }
+
+            try (var ps = c.prepareStatement("UPDATE appointments SET status = 'CANCELLED', cancel_reason = ? WHERE id = ?"))
+            {
+                ps.setString(1, Objects.requireNonNullElse(cancelReason, "Cancelled by staff"));
+                ps.setInt(2, id);
+
+                var affectedRows = ps.executeUpdate();
+                if (affectedRows == 0) { throw new IllegalStateException(String.format("Failed to update timeslot #%s", timeslotId)); }
+            }
+            catch (SQLException | IllegalStateException e)
+            {
+                c.rollback();
+                throw e;
+            }
+
+            updateBookedCountForTimeslot(c, timeslotId, -1);
+
+            c.commit();
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+    }
+
     private void updateBookedCountForTimeslot(Connection c, int timeslotId, int delta) throws SQLException
     {
         try (var ps = c.prepareStatement("UPDATE timeslots SET booked_count = booked_count + ? WHERE id = ?"))
@@ -413,6 +485,24 @@ public class Database
         }
     }
 
+    public boolean updateAppointment(Appointment appointment)
+    {
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("UPDATE appointments SET patient_id = ?, timeslot_id = ?, status = ?, booked_at = ?, cancel_reason = ? WHERE id = ?");
+            ps.setInt(1, appointment.getPatientId());
+            ps.setInt(2, appointment.getTimeslotId());
+            ps.setString(3, appointment.getStatus().name());
+            ps.setObject(4, appointment.getBookedAt());
+            ps.setString(5, appointment.getCancelReason());
+            ps.setInt(6, appointment.getId());
+
+            var affectedRows = ps.executeUpdate();
+            return (affectedRows > 0);
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+    }
+
     public List<Appointment> getAppointmentsByPatient(User patient)
     {
         var appointments = new ArrayList<Appointment>();
@@ -427,6 +517,89 @@ public class Database
                     ORDER BY slot_date DESC, start_time
                     """);
             ps.setInt(1, patient.getId());
+
+            var rs = ps.executeQuery();
+            while (rs.next()) { appointments.add(Appointment.from(rs)); }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return appointments;
+    }
+
+    public List<Appointment> getAppointmentsByClinic(Clinic clinic)
+    {
+        return getAppointmentsByClinic(clinic.getId());
+    }
+
+    public List<Appointment> getAppointmentsByClinic(int clinicId)
+    {
+        var appointments = new ArrayList<Appointment>();
+
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement(
+                    """
+                    SELECT appointments.* FROM appointments
+                        LEFT JOIN timeslots ON appointments.timeslot_id = timeslots.id
+                        LEFT JOIN clinic_services ON timeslots.clinic_service_id = clinic_services.id
+                    WHERE clinic_id = ?
+                    ORDER BY slot_date DESC, start_time
+                    """);
+            ps.setInt(1, clinicId);
+
+            var rs = ps.executeQuery();
+            while (rs.next()) { appointments.add(Appointment.from(rs)); }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return appointments;
+    }
+
+    public List<Appointment> getAppointmentsByService(ClinicService clinicService)
+    {
+        return getAppointmentsByService(clinicService.getId());
+    }
+
+    public List<Appointment> getAppointmentsByService(int clinicServiceId)
+    {
+        var appointments = new ArrayList<Appointment>();
+
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement(
+                    """
+                    SELECT appointments.* FROM appointments
+                        LEFT JOIN timeslots ON appointments.timeslot_id = timeslots.id
+                    WHERE clinic_service_id = ?
+                    ORDER BY slot_date DESC, start_time
+                    """);
+            ps.setInt(1, clinicServiceId);
+
+            var rs = ps.executeQuery();
+            while (rs.next()) { appointments.add(Appointment.from(rs)); }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return appointments;
+    }
+
+    public List<Appointment> getAppointmentsByServiceAndDate(ClinicService clinicService, LocalDate date)
+    {
+        return getAppointmentsByServiceAndDate(clinicService.getId(), date);
+    }
+
+    public List<Appointment> getAppointmentsByServiceAndDate(int clinicServiceId, LocalDate date)
+    {
+        var appointments = new ArrayList<Appointment>();
+
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement(
+                    """
+                    SELECT appointments.* FROM appointments
+                        LEFT JOIN timeslots ON appointments.timeslot_id = timeslots.id
+                    WHERE clinic_service_id = ? AND slot_date = ?
+                    ORDER BY slot_date DESC, start_time
+                    """);
+            ps.setInt(1, clinicServiceId);
+            ps.setObject(2, date);
 
             var rs = ps.executeQuery();
             while (rs.next()) { appointments.add(Appointment.from(rs)); }
