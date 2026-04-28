@@ -23,7 +23,7 @@ public class AuthMiddleware implements Filter, WithUser
         var response = (HttpServletResponse) res;
 
         var requestPath = request.getRequestURI();
-        if (requestPath.startsWith("/css"))
+        if (requestPath.startsWith("/css") || requestPath.startsWith("/js"))
         {
             chain.doFilter(req, res);
             return;

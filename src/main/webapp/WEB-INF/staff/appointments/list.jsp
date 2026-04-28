@@ -4,12 +4,12 @@
 
 <jsp:useBean id="appointments" scope="request" type="java.util.List<dev.jasonhk.hkiit.itp4511.clinicman.bean.Appointment>" />
 <jsp:useBean id="patients" scope="request" type="java.util.Map<java.lang.Integer, dev.jasonhk.hkiit.itp4511.clinicman.bean.User>" />
-<jsp:useBean id="clinics" scope="request" type="java.util.Map<java.lang.Integer, dev.jasonhk.hkiit.itp4511.clinicman.bean.Clinic>" />
 <jsp:useBean id="services" scope="request" type="java.util.Map<java.lang.Integer, dev.jasonhk.hkiit.itp4511.clinicman.bean.Service>" />
 <jsp:useBean id="clinicServices" scope="request" type="java.util.Map<java.lang.Integer, dev.jasonhk.hkiit.itp4511.clinicman.bean.ClinicService>" />
 <jsp:useBean id="timeslots" scope="request" type="java.util.Map<java.lang.Integer, dev.jasonhk.hkiit.itp4511.clinicman.bean.Timeslot>" />
 <jsp:useBean id="today" scope="request" type="java.time.LocalDate" />
 
+<!DOCTYPE html>
 <html>
 <head>
     <title>Appointments</title>
@@ -22,9 +22,7 @@
     </style>
 </head>
 <body>
-    <jsp:include page="/WEB-INF/includes/header.jsp">
-        <jsp:param name="type" value="staff" />
-    </jsp:include>
+    <jsp:include page="/WEB-INF/includes/header.jsp" />
 
     <main class="container">
         <h1>Appointments</h1>
@@ -73,7 +71,6 @@
                                         <a href data-action="confirm" data-id="${appointment.id}"
                                            data-date="${timeslot.slotDate}"
                                            data-time="${timeslot.startTime}"
-                                           data-location="${clinics.get(clinicService.clinicId).location}"
                                            data-service="${services.get(clinicService.serviceId).name}"
                                            data-patient="${patients.get(appointment.patientId).fullName}"
                                         >
@@ -84,7 +81,6 @@
                                         <a href data-action="cancel" data-id="${appointment.id}"
                                            data-date="${timeslot.slotDate}"
                                            data-time="${timeslot.startTime}"
-                                           data-location="${clinics.get(clinicService.clinicId).location}"
                                            data-service="${services.get(clinicService.serviceId).name}"
                                            data-patient="${patients.get(appointment.patientId).fullName}"
                                         >
@@ -97,7 +93,6 @@
                                         <a href data-action="check-in" data-id="${appointment.id}"
                                            data-date="${timeslot.slotDate}"
                                            data-time="${timeslot.startTime}"
-                                           data-location="${clinics.get(clinicService.clinicId).location}"
                                            data-service="${services.get(clinicService.serviceId).name}"
                                            data-patient="${patients.get(appointment.patientId).fullName}"
                                         >
@@ -106,7 +101,6 @@
                                         <a href data-action="no-show" data-id="${appointment.id}"
                                            data-date="${timeslot.slotDate}"
                                            data-time="${timeslot.startTime}"
-                                           data-location="${clinics.get(clinicService.clinicId).location}"
                                            data-service="${services.get(clinicService.serviceId).name}"
                                            data-patient="${patients.get(appointment.patientId).fullName}"
                                         >
@@ -117,7 +111,6 @@
                                         <a href data-action="complete" data-id="${appointment.id}"
                                            data-date="${timeslot.slotDate}"
                                            data-time="${timeslot.startTime}"
-                                           data-location="${clinics.get(clinicService.clinicId).location}"
                                            data-service="${services.get(clinicService.serviceId).name}"
                                            data-patient="${patients.get(appointment.patientId).fullName}"
                                         >
@@ -162,7 +155,6 @@
             <ul>
                 <li>Date: <span data-key="date"></span></li>
                 <li>Time: <span data-key="time"></span></li>
-                <li>Clinic: <span data-key="location"></span></li>
                 <li>Service: <span data-key="service"></span></li>
                 <li>Patient: <span data-key="patient"></span></li>
             </ul>
@@ -182,7 +174,6 @@
             <ul>
                 <li>Date: <span data-key="date"></span></li>
                 <li>Time: <span data-key="time"></span></li>
-                <li>Clinic: <span data-key="location"></span></li>
                 <li>Service: <span data-key="service"></span></li>
                 <li>Patient: <span data-key="patient"></span></li>
             </ul>
@@ -202,7 +193,6 @@
             <ul>
                 <li>Date: <span data-key="date"></span></li>
                 <li>Time: <span data-key="time"></span></li>
-                <li>Clinic: <span data-key="location"></span></li>
                 <li>Service: <span data-key="service"></span></li>
                 <li>Patient: <span data-key="patient"></span></li>
             </ul>
@@ -222,7 +212,6 @@
             <ul>
                 <li>Date: <span data-key="date"></span></li>
                 <li>Time: <span data-key="time"></span></li>
-                <li>Clinic: <span data-key="location"></span></li>
                 <li>Service: <span data-key="service"></span></li>
                 <li>Patient: <span data-key="patient"></span></li>
             </ul>
@@ -237,152 +226,14 @@
         </article>
     </dialog>
 
-    <script>
-        /** @type {HTMLDialogElement} */
-        const confirmDialog = document.querySelector("dialog[data-type=confirm]");
-        confirmDialog.querySelector("button.secondary").addEventListener("click", () => confirmDialog.close("No"));
-        confirmDialog.querySelector("button:not(.secondary)").addEventListener("click", () => confirmDialog.close("Yes"));
+    <script type="module">
+        import { initializeDialog } from "/js/dialog-helpers.js";
 
-        document.querySelectorAll("[data-action=confirm]").forEach((target) =>
-        {
-            target.addEventListener("click", (event) =>
-            {
-                event.preventDefault();
-
-                for (const key of Object.keys(target.dataset))
-                {
-                    const placeholder = confirmDialog.querySelector(`[data-key="\${key}"]`);
-                    if (placeholder) { placeholder.textContent = target.dataset[key]; }
-                }
-
-                confirmDialog.addEventListener("close", async () =>
-                {
-                    if (confirmDialog.returnValue === "Yes")
-                    {
-                        const response = await fetch(`/staff/appointments?action=confirm&id=\${target.dataset.id}`, { method: "POST" });
-                        if (response.ok) { location.reload(); }
-                    }
-                }, { once: true });
-                confirmDialog.showModal();
-            });
-        });
-
-        /** @type {HTMLDialogElement} */
-        const checkInDialog = document.querySelector("dialog[data-type=check-in]");
-        checkInDialog.querySelector("button.secondary").addEventListener("click", () => checkInDialog.close("No"));
-        checkInDialog.querySelector("button:not(.secondary)").addEventListener("click", () => checkInDialog.close("Yes"));
-
-        document.querySelectorAll("[data-action=check-in]").forEach((target) =>
-        {
-            target.addEventListener("click", (event) =>
-            {
-                event.preventDefault();
-
-                for (const key of Object.keys(target.dataset))
-                {
-                    const placeholder = checkInDialog.querySelector(`[data-key="\${key}"]`);
-                    if (placeholder) { placeholder.textContent = target.dataset[key]; }
-                }
-
-                checkInDialog.addEventListener("close", async () =>
-                {
-                    if (checkInDialog.returnValue === "Yes")
-                    {
-                        const response = await fetch(`/staff/appointments?action=check-in&id=\${target.dataset.id}`, { method: "POST" });
-                        if (response.ok) { location.reload(); }
-                    }
-                }, { once: true });
-                checkInDialog.showModal();
-            });
-        });
-
-        /** @type {HTMLDialogElement} */
-        const completeDialog = document.querySelector("dialog[data-type=complete]");
-        completeDialog.querySelector("button.secondary").addEventListener("click", () => completeDialog.close("No"));
-        completeDialog.querySelector("button:not(.secondary)").addEventListener("click", () => completeDialog.close("Yes"));
-
-        document.querySelectorAll("[data-action=complete]").forEach((target) =>
-        {
-            target.addEventListener("click", (event) =>
-            {
-                event.preventDefault();
-
-                for (const key of Object.keys(target.dataset))
-                {
-                    const placeholder = completeDialog.querySelector(`[data-key="\${key}"]`);
-                    if (placeholder) { placeholder.textContent = target.dataset[key]; }
-                }
-
-                completeDialog.addEventListener("close", async () =>
-                {
-                    if (completeDialog.returnValue === "Yes")
-                    {
-                        const response = await fetch(`/staff/appointments?action=complete&id=\${target.dataset.id}`, { method: "POST" });
-                        if (response.ok) { location.reload(); }
-                    }
-                }, { once: true });
-                completeDialog.showModal();
-            });
-        });
-
-        /** @type {HTMLDialogElement} */
-        const noShowDialog = document.querySelector("dialog[data-type=no-show]");
-        noShowDialog.querySelector("button.secondary").addEventListener("click", () => noShowDialog.close("No"));
-        noShowDialog.querySelector("button:not(.secondary)").addEventListener("click", () => noShowDialog.close("Yes"));
-
-        document.querySelectorAll("[data-action=no-show]").forEach((target) =>
-        {
-            target.addEventListener("click", (event) =>
-            {
-                event.preventDefault();
-
-                for (const key of Object.keys(target.dataset))
-                {
-                    const placeholder = noShowDialog.querySelector(`[data-key="\${key}"]`);
-                    if (placeholder) { placeholder.textContent = target.dataset[key]; }
-                }
-
-                noShowDialog.addEventListener("close", async () =>
-                {
-                    if (noShowDialog.returnValue === "Yes")
-                    {
-                        const response = await fetch(`/staff/appointments?action=no-show&id=\${target.dataset.id}`, { method: "POST" });
-                        if (response.ok) { location.reload(); }
-                    }
-                }, { once: true });
-                noShowDialog.showModal();
-            });
-        });
-
-        /** @type {HTMLDialogElement} */
-        const cancelDialog = document.querySelector("dialog[data-type=cancel]");
-        cancelDialog.querySelector("button.secondary").addEventListener("click", () => cancelDialog.close("No"));
-        cancelDialog.querySelector("button:not(.secondary)").addEventListener("click", () => cancelDialog.close("Yes"));
-
-        document.querySelectorAll("[data-action=cancel]").forEach((target) =>
-        {
-            target.addEventListener("click", (event) =>
-            {
-                event.preventDefault();
-
-                for (const key of Object.keys(target.dataset))
-                {
-                    const placeholder = cancelDialog.querySelector(`[data-key="\${key}"]`);
-                    if (placeholder) { placeholder.textContent = target.dataset[key]; }
-                }
-
-                cancelDialog.addEventListener("close", async () =>
-                {
-                    if (cancelDialog.returnValue === "Yes")
-                    {
-                        const body = new URLSearchParams({ cancelReason: cancelDialog.querySelector("[name=cancelReason]").value });
-                        const response = await fetch(`/staff/appointments?action=cancel&id=\${target.dataset.id}`, { method: "POST", body });
-                        if (response.ok) { location.reload(); }
-                    }
-                }, { once: true });
-                cancelDialog.showModal();
-            });
-        });
+        initializeDialog(document.querySelector("dialog[data-type=confirm]"), "/staff/appointments?action=confirm&id={id}", () => location.reload());
+        initializeDialog(document.querySelector("dialog[data-type=check-in]"), "/staff/appointments?action=check-in&id={id}", () => location.reload());
+        initializeDialog(document.querySelector("dialog[data-type=complete]"), "/staff/appointments?action=complete&id={id}", () => location.reload());
+        initializeDialog(document.querySelector("dialog[data-type=no-show]"), "/staff/appointments?action=no-show&id={id}", () => location.reload());
+        initializeDialog(document.querySelector("dialog[data-type=cancel]"), "/staff/appointments?action=cancel&id={id}", () => location.reload());
     </script>
 </body>
 </html>

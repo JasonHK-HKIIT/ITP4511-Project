@@ -7,6 +7,7 @@
 <jsp:useBean id="services" scope="request" type="java.util.Map<java.lang.Integer, dev.jasonhk.hkiit.itp4511.clinicman.bean.Service>" />
 <jsp:useBean id="clinicServices" scope="request" type="java.util.Map<java.lang.Integer, dev.jasonhk.hkiit.itp4511.clinicman.bean.ClinicService>" />
 
+<!DOCTYPE html>
 <html>
 <head>
     <title>Queues</title>
@@ -19,9 +20,7 @@
     </style>
 </head>
 <body>
-    <jsp:include page="/WEB-INF/includes/header.jsp">
-        <jsp:param name="type" value="patient" />
-    </jsp:include>
+    <jsp:include page="/WEB-INF/includes/header.jsp" />
 
     <main class="container">
         <h1>Queues</h1>
@@ -93,35 +92,10 @@
         </article>
     </dialog>
 
-    <script>
-        /** @type {HTMLDialogElement} */
-        const leaveDialog = document.querySelector("dialog[data-type=leave]");
-        leaveDialog.querySelector("button.secondary").addEventListener("click", () => leaveDialog.close("No"));
-        leaveDialog.querySelector("button:not(.secondary)").addEventListener("click", () => leaveDialog.close("Yes"));
+    <script type="module">
+        import { initializeDialog } from "/js/dialog-helpers.js";
 
-        document.querySelectorAll("[data-action=leave]").forEach((target) =>
-        {
-            target.addEventListener("click", (event) =>
-            {
-                event.preventDefault();
-
-                for (const key of Object.keys(target.dataset))
-                {
-                    const placeholder = leaveDialog.querySelector(`[data-key="\${key}"]`);
-                    if (placeholder) { placeholder.textContent = target.dataset[key]; }
-                }
-
-                leaveDialog.addEventListener("close", async () =>
-                {
-                    if (leaveDialog.returnValue === "Yes")
-                    {
-                        const response = await fetch(`/queues?action=leave&id=\${target.dataset.id}`, { method: "POST" });
-                        if (response.ok) { location.reload(); }
-                    }
-                }, { once: true });
-                leaveDialog.showModal();
-            });
-        });
+        initializeDialog(document.querySelector("dialog[data-type=leave]"), "/queues?action=leave&id={id}", () => location.reload());
     </script>
 </body>
 </html>

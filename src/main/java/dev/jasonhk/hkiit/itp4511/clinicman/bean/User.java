@@ -3,7 +3,6 @@ package dev.jasonhk.hkiit.itp4511.clinicman.bean;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.Date;
 
 public class User
 {

@@ -9,15 +9,14 @@
 <jsp:useBean id="service" scope="request" type="dev.jasonhk.hkiit.itp4511.clinicman.bean.Service" />
 <jsp:useBean id="timeslots" scope="request" type="java.util.List<dev.jasonhk.hkiit.itp4511.clinicman.bean.Timeslot>" />
 
+<!DOCTYPE html>
 <html>
 <head>
     <title>Reschedule Appointment</title>
     <link rel="stylesheet" href="/css/pico.jade.min.css">
 </head>
 <body>
-    <jsp:include page="/WEB-INF/includes/header.jsp">
-        <jsp:param name="type" value="patient" />
-    </jsp:include>
+    <jsp:include page="/WEB-INF/includes/header.jsp" />
 
     <main class="container">
         <h1>Reschedule Appointment</h1>

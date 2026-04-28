@@ -1,4 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<jsp:useBean id="user" scope="request" type="dev.jasonhk.hkiit.itp4511.clinicman.bean.User" />
+
 <header class="container-fluid">
     <nav>
         <ul>
@@ -7,12 +10,12 @@
         <ul>
             <li><a href="/">Home</a></li>
             <c:choose>
-                <c:when test="${param.type == 'patient'}">
+                <c:when test="${user.role == 'PATIENT'}">
                     <li><a href="/clinics">Clinics</a></li>
                     <li><a href="/appointments">Appointments</a></li>
                     <li><a href="/queues">Queues</a></li>
                 </c:when>
-                <c:when test="${param.type == 'staff'}">
+                <c:when test="${user.role == 'STAFF'}">
                     <li><a href="/staff/appointments">Appointments</a></li>
                     <li><a href="/staff/queues">Queues</a></li>
                 </c:when>

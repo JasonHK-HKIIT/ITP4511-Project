@@ -11,9 +11,7 @@
     <link rel="stylesheet" href="/css/pico.jade.min.css">
 </head>
 <body>
-    <jsp:include page="/WEB-INF/includes/header.jsp">
-        <jsp:param name="type" value="staff" />
-    </jsp:include>
+    <jsp:include page="/WEB-INF/includes/header.jsp" />
 
     <main class="container">
         <h1>Welcome, ${user.fullName}</h1>

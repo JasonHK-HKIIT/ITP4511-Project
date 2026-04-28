@@ -1,6 +1,7 @@
-package dev.jasonhk.hkiit.itp4511.clinicman.controller.patient;
+package dev.jasonhk.hkiit.itp4511.clinicman.controller.staff;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -10,12 +11,13 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.Clinic;
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.ClinicService;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.QueueTicket;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.QueueTicketStatus;
 import dev.jasonhk.hkiit.itp4511.clinicman.bean.Service;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.User;
 import dev.jasonhk.hkiit.itp4511.clinicman.controller.Controller;
 
-@WebServlet("/queues")
+@WebServlet("/staff/queues")
 public class QueuesController extends Controller
 {
     @Override
@@ -27,19 +29,20 @@ public class QueuesController extends Controller
             case "list" ->
             {
                 var user = getCurrentUser(request);
-                var queueTickets = database.getQueueTicketsByPatient(user);
-                var clinics = database.getClinics().stream()
-                        .collect(Collectors.toMap(Clinic::getId, Function.identity()));
+                var queueTickets = database.getQueueTicketsByClinicAndDate(Objects.requireNonNull(user.getClinicId()), LocalDate.now()).stream()
+                        .collect(Collectors.groupingBy(QueueTicket::getClinicServiceId));
+
+                var patients = database.getUsers().stream()
+                        .collect(Collectors.toMap(User::getId, Function.identity()));
                 var services = database.getServices().stream()
                         .collect(Collectors.toMap(Service::getId, Function.identity()));
-                var clinicServices = database.getClinicServices().stream()
-                        .collect(Collectors.toMap(ClinicService::getId, Function.identity()));
+                var clinicServices = database.getClinicServicesByClinic(user.getClinicId());
 
                 request.setAttribute("queueTickets", queueTickets);
-                request.setAttribute("clinics", clinics);
+                request.setAttribute("patients", patients);
                 request.setAttribute("services", services);
                 request.setAttribute("clinicServices", clinicServices);
-                request.getRequestDispatcher("/WEB-INF/patient/queues/list.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/staff/queues/list.jsp").forward(request, response);
             }
             default -> response.sendError(HttpServletResponse.SC_BAD_REQUEST, String.format("Action %s is not supported", action));
         }
@@ -51,20 +54,31 @@ public class QueuesController extends Controller
         var action = Objects.requireNonNullElse(request.getParameter("action"), "list").toLowerCase();
         switch (action)
         {
-            case "join" ->
+            case "call" ->
             {
-                var user = getCurrentUser(request);
-                var id = Integer.parseInt(request.getParameter("service"));
-                database.joinQueue(user, id);
+                var id = Integer.parseInt(request.getParameter("id"));
+                var queueTicket = database.getQueueTicketById(id);
+                queueTicket.setStatus(QueueTicketStatus.CALLED);
 
+                database.updateQueueTicket(queueTicket);
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
-            case "leave" ->
+            case "complete" ->
             {
-                var user = getCurrentUser(request);
                 var id = Integer.parseInt(request.getParameter("id"));
-                database.leaveQueueByPatient(id, user);
+                var queueTicket = database.getQueueTicketById(id);
+                queueTicket.setStatus(QueueTicketStatus.COMPLETED);
 
+                database.updateQueueTicket(queueTicket);
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            }
+            case "skip" ->
+            {
+                var id = Integer.parseInt(request.getParameter("id"));
+                var queueTicket = database.getQueueTicketById(id);
+                queueTicket.setStatus(QueueTicketStatus.SKIPPED);
+
+                database.updateQueueTicket(queueTicket);
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
             default -> response.sendError(HttpServletResponse.SC_BAD_REQUEST, String.format("Action %s is not supported", action));

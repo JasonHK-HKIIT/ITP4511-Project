@@ -6,12 +6,17 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.AppointmentStatus;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.Clinic;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.ClinicService;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.Service;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.Timeslot;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.User;
 import dev.jasonhk.hkiit.itp4511.clinicman.controller.Controller;
 
 @WebServlet("/staff/appointments")
@@ -31,8 +36,6 @@ public class AppointmentsController extends Controller
 
                 var patients = database.getUsers().stream()
                         .collect(Collectors.toMap(User::getId, Function.identity()));
-                var clinics = database.getClinics().stream()
-                        .collect(Collectors.toMap(Clinic::getId, Function.identity()));
                 var services = database.getServices().stream()
                         .collect(Collectors.toMap(Service::getId, Function.identity()));
                 var clinicServices = database.getClinicServices().stream()
@@ -43,7 +46,6 @@ public class AppointmentsController extends Controller
 
                 request.setAttribute("appointments", appointments);
                 request.setAttribute("patients", patients);
-                request.setAttribute("clinics", clinics);
                 request.setAttribute("services", services);
                 request.setAttribute("clinicServices", clinicServices);
                 request.setAttribute("timeslots", timeslots);
