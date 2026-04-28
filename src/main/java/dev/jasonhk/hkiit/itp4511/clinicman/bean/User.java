@@ -2,6 +2,7 @@ package dev.jasonhk.hkiit.itp4511.clinicman.bean;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Date;
 
 public class User
@@ -12,7 +13,7 @@ public class User
     private String phone;
     private Role role;
     private Gender gender;
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
     public User(String username, String fullName, Role role)
     {
@@ -21,7 +22,7 @@ public class User
         this.role = role;
     }
 
-    public User(int id, String username, String fullName, String phone, Role role, Gender gender, Date dateOfBirth)
+    public User(int id, String username, String fullName, String phone, Role role, Gender gender, LocalDate dateOfBirth)
     {
         this.id = id;
         this.username = username;
@@ -92,12 +93,12 @@ public class User
         this.gender = gender;
     }
 
-    public Date getDateOfBirth()
+    public LocalDate getDateOfBirth()
     {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth)
+    public void setDateOfBirth(LocalDate dateOfBirth)
     {
         this.dateOfBirth = dateOfBirth;
     }
@@ -112,6 +113,6 @@ public class User
                 rs.getString("phone"),
                 Role.valueOf(rs.getString("role")),
                 (gender != null) ? Gender.valueOf(gender) : null,
-                rs.getDate("date_of_birth"));
+                rs.getObject("date_of_birth", LocalDate.class));
     }
 }

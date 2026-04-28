@@ -7,7 +7,7 @@
 <html lang="en">
 <head>
     <title>Clinics</title>
-    <link rel="stylesheet" href="/css/pico.slate.min.css">
+    <link rel="stylesheet" href="/css/pico.jade.min.css">
     <style>
         details > :not(summary)
         {
@@ -45,7 +45,12 @@
                                 </c:url>
                                 <a href="${bookAppointment}">[Book Appointment]</a>
                                 <c:if test="${clinic.walkinEnabled}">
-                                    <a href="/queue?action=join&service=${service.id}">[Join Queue]</a>
+                                    <a href data-action="queue" data-id="${service.id}"
+                                       data-location="${clinic.location}"
+                                       data-service="${services.get(service.serviceId).name}"
+                                    >
+                                        [Join Queue]
+                                    </a>
                                 </c:if>
                             </li>
                         </c:forEach>
@@ -55,5 +60,53 @@
             <hr />
         </c:forEach>
     </main>
+
+    <dialog data-type="queue">
+        <article>
+            <h2>Join Queue</h2>
+            <p>
+                Are you sure to join the queue below?
+            </p>
+            <ul>
+                <li>Clinic: <span data-key="location"></span></li>
+                <li>Service: <span data-key="service"></span></li>
+            </ul>
+            <footer>
+                <button class="secondary">No</button>
+                <button>Yes</button>
+            </footer>
+        </article>
+    </dialog>
+
+    <script>
+        /** @type {HTMLDialogElement} */
+        const queueDialog = document.querySelector("dialog[data-type=queue]");
+        queueDialog.querySelector("button.secondary").addEventListener("click", () => queueDialog.close("No"));
+        queueDialog.querySelector("button:not(.secondary)").addEventListener("click", () => queueDialog.close("Yes"));
+
+        document.querySelectorAll("[data-action=queue]").forEach((target) =>
+        {
+            target.addEventListener("click", (event) =>
+            {
+                event.preventDefault();
+
+                for (const key of Object.keys(target.dataset))
+                {
+                    const placeholder = queueDialog.querySelector(`[data-key="\${key}"]`);
+                    if (placeholder) { placeholder.textContent = target.dataset[key]; }
+                }
+
+                queueDialog.addEventListener("close", async () =>
+                {
+                    if (queueDialog.returnValue === "Yes")
+                    {
+                        const response = await fetch(`/queues?action=join&service=\${target.dataset.id}`, { method: "POST" });
+                        if (response.ok) { location.pathname = "/queues"; }
+                    }
+                }, { once: true });
+                queueDialog.showModal();
+            });
+        });
+    </script>
 </body>
 </html>

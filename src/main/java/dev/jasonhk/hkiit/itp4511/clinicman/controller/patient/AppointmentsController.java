@@ -80,23 +80,14 @@ public class AppointmentsController extends Controller
                 request.setAttribute("timeslots", timeslots);
                 request.getRequestDispatcher("/WEB-INF/patient/appointments/reschedule.jsp").forward(request, response);
             }
-            case "fetch" ->
+            case "timeslots" ->
             {
-                var type = Objects.requireNonNullElse(request.getParameter("type"), "null").toLowerCase();
-                //noinspection SwitchStatementWithTooFewBranches
-                switch (type)
-                {
-                    case "timeslots" ->
-                    {
-                        var id = Integer.parseInt(request.getParameter("service"));
-                        var date = LocalDate.parse(request.getParameter("date"));
-                        var timeslots = database.getTimeslotsByClinicServiceAndDate(id, date);
+                var id = Integer.parseInt(request.getParameter("service"));
+                var date = LocalDate.parse(request.getParameter("date"));
+                var timeslots = database.getTimeslotsByClinicServiceAndDate(id, date);
 
-                        request.setAttribute("timeslots", timeslots);
-                        request.getRequestDispatcher("/WEB-INF/patient/appointments/book-timeslots.jsp").forward(request, response);
-                    }
-                    default -> response.sendError(HttpServletResponse.SC_BAD_REQUEST, String.format("Type %s is not supported", type));
-                }
+                request.setAttribute("timeslots", timeslots);
+                request.getRequestDispatcher("/WEB-INF/patient/appointments/timeslots.jsp").forward(request, response);
             }
             default -> response.sendError(HttpServletResponse.SC_BAD_REQUEST, String.format("Action %s is not supported", action));
         }
@@ -112,7 +103,7 @@ public class AppointmentsController extends Controller
             {
                 var user = getCurrentUser(request);
                 var timeslotId = Integer.parseInt(request.getParameter("timeslot"));
-                var appointment = database.bookAppointment(user.getId(), timeslotId);
+                database.bookAppointment(user.getId(), timeslotId);
 
                 response.sendRedirect("/appointments");
             }
@@ -124,6 +115,14 @@ public class AppointmentsController extends Controller
                 database.rescheduleAppointmentByPatient(id, timeslotId, user);
 
                 response.sendRedirect("/appointments");
+            }
+            case "cancel" ->
+            {
+                var user = getCurrentUser(request);
+                var id = Integer.parseInt(request.getParameter("id"));
+                database.cancelAppointmentByPatient(id, user);
+
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
             default -> response.sendError(HttpServletResponse.SC_BAD_REQUEST, String.format("Action %s is not supported", action));
         }

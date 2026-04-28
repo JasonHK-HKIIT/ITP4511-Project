@@ -27,12 +27,4 @@ public interface WithUser
             session.setAttribute("user", user);
         }
     }
-
-    default boolean ensureLoggedIn(HttpServletRequest request, HttpServletResponse response) throws IOException
-    {
-        if (getCurrentUser(request) != null) { return true; }
-
-        response.sendRedirect("/login");
-        return false;
-    }
 }

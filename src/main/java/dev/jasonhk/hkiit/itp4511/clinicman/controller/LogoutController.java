@@ -16,8 +16,6 @@ public class LogoutController extends HttpServlet implements WithUser
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
-        if (!ensureLoggedIn(request, response)) { return; }
-
         setCurrentUser(request, null);
         response.sendRedirect("/login");
     }

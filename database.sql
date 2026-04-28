@@ -244,23 +244,41 @@ CREATE TABLE appointments
 -- Helps reduce accidental double-booking checks per patient and slot
 CREATE UNIQUE INDEX uq_patient_timeslot ON appointments (patient_id, timeslot_id);
 
+-- Add Here!
+
 -- =========================
--- 7. QUEUE_TICKETS
+-- 7. QUEUES
+-- =========================
+CREATE TABLE queues
+(
+    id                INT AUTO_INCREMENT PRIMARY KEY,
+    clinic_service_id INT  NOT NULL,
+    queue_date        DATE NOT NULL,
+    last_queue_number INT  NOT NULL DEFAULT 0,
+
+    CONSTRAINT fk_queues_clinic_service
+        FOREIGN KEY (clinic_service_id) REFERENCES clinic_services (id)
+            ON DELETE CASCADE ON UPDATE CASCADE,
+
+    CONSTRAINT uq_queues_clinic_service_date UNIQUE (clinic_service_id, queue_date),
+    CONSTRAINT chk_last_queue_number CHECK (last_queue_number >= 0)
+);
+
+-- =========================
+-- 8. QUEUE_TICKETS
 -- =========================
 CREATE TABLE queue_tickets
 (
-    queue_ticket_id        INT AUTO_INCREMENT PRIMARY KEY,
-    patient_id             INT         NOT NULL,
-    clinic_service_id      INT         NOT NULL,
-    queue_date             DATE        NOT NULL,
-    queue_number           VARCHAR(20) NOT NULL,
-    status                 ENUM('WAITING', 'CALLED', 'SKIPPED', 'SERVED', 'EXPIRED', 'CANCELLED') NOT NULL DEFAULT 'WAITING',
-    estimated_wait_minutes INT         NOT NULL DEFAULT 0,
-    joined_at              DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id                     INT AUTO_INCREMENT PRIMARY KEY,
+    patient_id             INT      NOT NULL,
+    clinic_service_id      INT      NOT NULL,
+    queue_date             DATE     NOT NULL,
+    queue_number           INT      NOT NULL,
+    status                 ENUM('WAITING', 'CALLED', 'COMPLETED', 'SKIPPED', 'LEFT') NOT NULL DEFAULT 'WAITING',
+    estimated_wait_minutes INT      NOT NULL DEFAULT 0,
+    joined_at              DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     called_at              DATETIME NULL,
     served_at              DATETIME NULL,
-    handled_by_staff_id    INT NULL,
-    remarks                VARCHAR(255) NULL,
 
     CONSTRAINT fk_queue_patient
         FOREIGN KEY (patient_id) REFERENCES users (id)
@@ -270,16 +288,12 @@ CREATE TABLE queue_tickets
         FOREIGN KEY (clinic_service_id) REFERENCES clinic_services (id)
             ON DELETE RESTRICT ON UPDATE CASCADE,
 
-    CONSTRAINT fk_queue_handled_by_staff
-        FOREIGN KEY (handled_by_staff_id) REFERENCES users (id)
-            ON DELETE SET NULL ON UPDATE CASCADE,
-
     CONSTRAINT uq_queue_number UNIQUE (clinic_service_id, queue_date, queue_number),
     CONSTRAINT chk_estimated_wait CHECK (estimated_wait_minutes >= 0)
 );
 
 -- =========================
--- 8. NOTIFICATIONS
+-- 9. NOTIFICATIONS
 -- =========================
 CREATE TABLE notifications
 (
@@ -300,12 +314,12 @@ CREATE TABLE notifications
             ON DELETE SET NULL ON UPDATE CASCADE,
 
     CONSTRAINT fk_notifications_queue_ticket
-        FOREIGN KEY (related_queue_ticket_id) REFERENCES queue_tickets (queue_ticket_id)
+        FOREIGN KEY (related_queue_ticket_id) REFERENCES queue_tickets (id)
             ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- =========================
--- 9. STAFF_CLINIC_ASSIGNMENTS
+-- 10. STAFF_CLINIC_ASSIGNMENTS
 -- =========================
 CREATE TABLE staff_clinic_assignments
 (
@@ -327,7 +341,7 @@ CREATE TABLE staff_clinic_assignments
 );
 
 -- =========================
--- 10. POLICY_SETTINGS
+-- 11. POLICY_SETTINGS
 -- =========================
 CREATE TABLE policy_settings
 (

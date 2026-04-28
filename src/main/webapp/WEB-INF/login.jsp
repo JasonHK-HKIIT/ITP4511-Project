@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Login</title>
-    <link rel="stylesheet" href="/css/pico.slate.min.css">
+    <link rel="stylesheet" href="/css/pico.jade.min.css">
 </head>
 <body>
     <header class="container">
@@ -35,6 +35,7 @@
                 </fieldset>
 
                 <button type="submit">Login</button>
+                <a href="/register" role="button" class="secondary" style="width: 100%">Register</a>
             </form>
         <% } %>
     </main>

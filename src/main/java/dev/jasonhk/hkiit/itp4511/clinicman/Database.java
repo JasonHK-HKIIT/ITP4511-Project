@@ -33,6 +33,47 @@ public class Database
         return DriverManager.getConnection(url, user, password);
     }
 
+    public Connection getConnection(boolean autoCommit) throws SQLException
+    {
+        var connection = getConnection();
+        connection.setAutoCommit(autoCommit);
+        return connection;
+    }
+
+    public User getUserById(int id)
+    {
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("SELECT * FROM users WHERE id = ?");
+            ps.setInt(1, id);
+
+            var rs = ps.executeQuery();
+            if (rs.next()) { return User.from(rs); }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return null;
+    }
+
+    public boolean updateUser(User user)
+    {
+        try (var c = getConnection())
+        {
+            var gender = user.getGender();
+
+            var ps = c.prepareStatement("UPDATE users SET username = ?, full_name = ?, phone = ?, gender = ?, date_of_birth = ? WHERE id = ?");
+            ps.setString(1, user.getUsername());
+            ps.setString(2, user.getFullName());
+            ps.setString(3, user.getPhone());
+            ps.setString(4, (gender != null) ? gender.name() : null);
+            ps.setObject(5, user.getDateOfBirth());
+            ps.setInt(6, user.getId());
+
+            var affectedRows = ps.executeUpdate();
+            return (affectedRows > 0);
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+    }
+
     public User getUserByCredentials(String username, String password)
     {
         try (var c = getConnection())
@@ -268,10 +309,8 @@ public class Database
 
     public void rescheduleAppointmentByPatient(int id, int timeslotId, int patientId)
     {
-        try (var c = getConnection())
+        try (var c = getConnection(false))
         {
-            c.setAutoCommit(false);
-
             int oldTimeslotId;
             try (var ps = c.prepareStatement("SELECT timeslot_id FROM appointments WHERE id = ? AND patient_id = ?"))
             {
@@ -311,6 +350,52 @@ public class Database
         catch (SQLException e) { throw new RuntimeException(e); }
     }
 
+    public void cancelAppointmentByPatient(int id, User patient)
+    {
+        cancelAppointmentByPatient(id, patient.getId());
+    }
+
+    public void cancelAppointmentByPatient(int id, int patientId)
+    {
+        try (var c = getConnection(false))
+        {
+            int timeslotId;
+            try (var ps = c.prepareStatement("SELECT timeslot_id FROM appointments WHERE id = ? AND patient_id = ?"))
+            {
+                ps.setInt(1, id);
+                ps.setInt(2, patientId);
+
+                var rs = ps.executeQuery();
+                if (!rs.next()) { throw new IllegalStateException(String.format("Failed to query appointment #%d", id)); }
+
+                timeslotId = rs.getInt("timeslot_id");
+            }
+            catch (SQLException | IllegalStateException e)
+            {
+                c.rollback();
+                throw e;
+            }
+
+            try (var ps = c.prepareStatement("UPDATE appointments SET status = 'CANCELLED', cancel_reason = 'Cancelled by patient' WHERE id = ?"))
+            {
+                ps.setInt(1, id);
+
+                var affectedRows = ps.executeUpdate();
+                if (affectedRows == 0) { throw new IllegalStateException(String.format("Failed to update timeslot #%s", timeslotId)); }
+            }
+            catch (SQLException | IllegalStateException e)
+            {
+                c.rollback();
+                throw e;
+            }
+
+            updateBookedCountForTimeslot(c, timeslotId, -1);
+
+            c.commit();
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+    }
+
     private void updateBookedCountForTimeslot(Connection c, int timeslotId, int delta) throws SQLException
     {
         try (var ps = c.prepareStatement("UPDATE timeslots SET booked_count = booked_count + ? WHERE id = ?"))
@@ -334,11 +419,120 @@ public class Database
 
         try (var c = getConnection())
         {
-            var ps = c.prepareStatement("SELECT appointments.* FROM appointments LEFT JOIN timeslots ON appointments.timeslot_id = timeslots.id WHERE patient_id = ? ORDER BY slot_date DESC, start_time");
+            var ps = c.prepareStatement(
+                    """
+                    SELECT appointments.* FROM appointments
+                        LEFT JOIN timeslots ON appointments.timeslot_id = timeslots.id
+                    WHERE patient_id = ?
+                    ORDER BY slot_date DESC, start_time
+                    """);
             ps.setInt(1, patient.getId());
 
             var rs = ps.executeQuery();
             while (rs.next()) { appointments.add(Appointment.from(rs)); }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return appointments;
+    }
+
+    public QueueTicket joinQueue(User patient, int clinicServiceId)
+    {
+        return joinQueue(patient.getId(), clinicServiceId);
+    }
+
+    public QueueTicket joinQueue(int patientId, int clinicServiceId)
+    {
+        var today = LocalDate.now();
+
+        try (var c = getConnection(false))
+        {
+            int queueNumber;
+            try (var ps = c.prepareStatement("INSERT INTO queues (clinic_service_id, queue_date, last_queue_number) VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE last_queue_number = LAST_INSERT_ID(last_queue_number + 1)", Statement.RETURN_GENERATED_KEYS))
+            {
+                ps.setInt(1, clinicServiceId);
+                ps.setObject(2, today);
+
+                ps.executeUpdate();
+                var rs = ps.getGeneratedKeys();
+                if (!rs.next()) { throw new IllegalStateException("No queue was inserted/updated"); }
+
+                queueNumber = rs.getInt(1);
+            }
+            catch (SQLException | IllegalStateException e)
+            {
+                c.rollback();
+                throw e;
+            }
+
+            int id;
+            try (var ps = c.prepareStatement("INSERT INTO queue_tickets (patient_id, clinic_service_id, queue_date, queue_number) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS))
+            {
+                ps.setInt(1, patientId);
+                ps.setInt(2, clinicServiceId);
+                ps.setObject(3, today);
+                ps.setInt(4, queueNumber);
+
+                ps.executeUpdate();
+                var rs = ps.getGeneratedKeys();
+                if (!rs.next()) { throw new IllegalStateException("No queue ticket was inserted"); }
+
+                id = rs.getInt(1);
+            }
+            catch (SQLException | IllegalStateException e)
+            {
+                c.rollback();
+                throw e;
+            }
+
+            try (var ps = c.prepareStatement("SELECT * FROM queue_tickets WHERE id = ?"))
+            {
+                ps.setInt(1, id);
+
+                var rs = ps.executeQuery();
+                if (!rs.next()) { throw new IllegalStateException(String.format("Failed to query queue ticket #%d", id)); }
+
+                c.commit();
+                return QueueTicket.from(rs);
+            }
+            catch (SQLException | IllegalStateException e)
+            {
+                c.rollback();
+                throw e;
+            }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+    }
+
+    public void leaveQueueByPatient(int id, User patient)
+    {
+        leaveQueueByPatient(id, patient.getId());
+    }
+
+    public void leaveQueueByPatient(int id, int patientId)
+    {
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("UPDATE queue_tickets SET status = 'LEFT' WHERE id = ? AND patient_id = ?");
+            ps.setInt(1, id);
+            ps.setInt(2, patientId);
+
+            var affectedRows = ps.executeUpdate();
+            if (affectedRows == 0) { throw new IllegalStateException(String.format("Failed to update queue ticket #%s", id)); }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+    }
+
+    public List<QueueTicket> getQueueTicketsByPatient(User patient)
+    {
+        var appointments = new ArrayList<QueueTicket>();
+
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("SELECT * FROM queue_tickets WHERE patient_id = ? ORDER BY queue_date DESC");
+            ps.setInt(1, patient.getId());
+
+            var rs = ps.executeQuery();
+            while (rs.next()) { appointments.add(QueueTicket.from(rs)); }
         }
         catch (SQLException e) { throw new RuntimeException(e); }
         return appointments;
