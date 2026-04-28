@@ -35,8 +35,8 @@
                     Gender
                     <select name="gender">
                         <option value="">Unspecified</option>
-                        <option value="MALE"${(user.gender.name() == 'MALE') ? ' selected' : ''}>Male</option>
-                        <option value="FEMALE"${(user.gender.name() == 'FEMALE') ? ' selected' : ''}>Female</option>
+                        <option value="MALE"${(user.gender == 'MALE') ? ' selected' : ''}>Male</option>
+                        <option value="FEMALE"${(user.gender == 'FEMALE') ? ' selected' : ''}>Female</option>
                     </select>
                 </label>
                 <label>

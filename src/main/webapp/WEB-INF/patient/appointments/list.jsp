@@ -54,18 +54,18 @@
                         <td>${services.get(clinicService.serviceId).name}</td>
                         <td>
                             <c:choose>
-                                <c:when test="${appointment.status.name() == 'PENDING'}">Pending</c:when>
-                                <c:when test="${appointment.status.name() == 'CONFIRMED'}">Confirmed</c:when>
-                                <c:when test="${appointment.status.name() == 'ARRIVED'}">Arrived</c:when>
-                                <c:when test="${appointment.status.name() == 'COMPLETED'}">Completed</c:when>
-                                <c:when test="${appointment.status.name() == 'NO_SHOW'}">No Show</c:when>
-                                <c:when test="${appointment.status.name() == 'CANCELLED'}">
+                                <c:when test="${appointment.status == 'PENDING'}">Pending</c:when>
+                                <c:when test="${appointment.status == 'CONFIRMED'}">Confirmed</c:when>
+                                <c:when test="${appointment.status == 'ARRIVED'}">Arrived</c:when>
+                                <c:when test="${appointment.status == 'COMPLETED'}">Completed</c:when>
+                                <c:when test="${appointment.status == 'NO_SHOW'}">No Show</c:when>
+                                <c:when test="${appointment.status == 'CANCELLED'}">
                                     <span data-tooltip="${appointment.cancelReason}">Cancelled</span>
                                 </c:when>
                             </c:choose>
                         </td>
                         <td>
-                            <c:if test="${appointment.status.ordinal() < 2}">
+                            <c:if test="${(appointment.status == 'PENDING') || (appointment.status == 'CONFIRMED')}">
                                 <c:url value="/appointments" var="rescheduleAppointment">
                                     <c:param name="action" value="reschedule" />
                                     <c:param name="id" value="${appointment.id}" />

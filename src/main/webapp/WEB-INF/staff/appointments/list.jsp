@@ -56,12 +56,12 @@
                         <td>${patients.get(appointment.patientId).fullName}</td>
                         <td>
                             <c:choose>
-                                <c:when test="${appointment.status.name() == 'PENDING'}">Pending</c:when>
-                                <c:when test="${appointment.status.name() == 'CONFIRMED'}">Confirmed</c:when>
-                                <c:when test="${appointment.status.name() == 'ARRIVED'}">Arrived</c:when>
-                                <c:when test="${appointment.status.name() == 'COMPLETED'}">Completed</c:when>
-                                <c:when test="${appointment.status.name() == 'NO_SHOW'}">No Show</c:when>
-                                <c:when test="${appointment.status.name() == 'CANCELLED'}">
+                                <c:when test="${appointment.status == 'PENDING'}">Pending</c:when>
+                                <c:when test="${appointment.status == 'CONFIRMED'}">Confirmed</c:when>
+                                <c:when test="${appointment.status == 'ARRIVED'}">Arrived</c:when>
+                                <c:when test="${appointment.status == 'COMPLETED'}">Completed</c:when>
+                                <c:when test="${appointment.status == 'NO_SHOW'}">No Show</c:when>
+                                <c:when test="${appointment.status == 'CANCELLED'}">
                                     <span data-tooltip="${appointment.cancelReason}">Cancelled</span>
                                 </c:when>
                             </c:choose>
