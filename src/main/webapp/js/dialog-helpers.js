@@ -28,7 +28,6 @@ export function initializeDialog(dialog, url, onSuccess = () => {})
                 if (dialog.returnValue === "Yes")
                 {
                     const body = toSearchParams(dialog);
-                    console.log(body);
                     const response = await fetch(template(url, target.dataset), { method: "POST", body });
                     if (response.ok) { onSuccess(); }
                 }
