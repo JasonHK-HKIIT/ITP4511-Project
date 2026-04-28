@@ -23,7 +23,8 @@ public class HomeController extends Controller
             }
             case STAFF ->
             {
-
+                request.setAttribute("user", user);
+                request.getRequestDispatcher("/WEB-INF/staff/home.jsp").forward(request, response);
             }
             case ADMIN ->
             {
