@@ -9,6 +9,7 @@
 <jsp:useBean id="tomorrow" scope="request" type="java.time.LocalDate" />
 <jsp:useBean id="timeslots" scope="request" type="java.util.List<dev.jasonhk.hkiit.itp4511.clinicman.bean.Timeslot>" />
 
+<!DOCTYPE html>
 <html>
 <head>
     <title>Book Appointment</title>

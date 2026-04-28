@@ -9,6 +9,7 @@
 <jsp:useBean id="service" scope="request" type="dev.jasonhk.hkiit.itp4511.clinicman.bean.Service" />
 <jsp:useBean id="timeslots" scope="request" type="java.util.List<dev.jasonhk.hkiit.itp4511.clinicman.bean.Timeslot>" />
 
+<!DOCTYPE html>
 <html>
 <head>
     <title>Reschedule Appointment</title>

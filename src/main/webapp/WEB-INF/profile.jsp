@@ -4,6 +4,7 @@
 
 <jsp:useBean id="user" scope="request" type="dev.jasonhk.hkiit.itp4511.clinicman.bean.User" />
 
+<!DOCTYPE html>
 <html>
 <head>
     <title>Profile</title>

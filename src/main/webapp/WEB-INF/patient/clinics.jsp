@@ -3,6 +3,7 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <fmt:setLocale value="en-HK" />
 
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Clinics</title>

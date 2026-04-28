@@ -10,6 +10,7 @@
 <jsp:useBean id="timeslots" scope="request" type="java.util.Map<java.lang.Integer, dev.jasonhk.hkiit.itp4511.clinicman.bean.Timeslot>" />
 <jsp:useBean id="today" scope="request" type="java.time.LocalDate" />
 
+<!DOCTYPE html>
 <html>
 <head>
     <title>Appointments</title>
