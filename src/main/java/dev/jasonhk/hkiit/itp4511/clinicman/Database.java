@@ -210,6 +210,22 @@ public class Database
         return clinicServices;
     }
 
+    public List<ClinicService> getClinicServicesByClinic(int clinicId)
+    {
+        var clinicServices = new ArrayList<ClinicService>();
+
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("SELECT * FROM clinic_services WHERE clinic_id = ?");
+            ps.setInt(1, clinicId);
+
+            var rs = ps.executeQuery();
+            while (rs.next()) { clinicServices.add(ClinicService.from(rs)); }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return clinicServices;
+    }
+
     public Timeslot getTimeslotById(int id)
     {
         try (var c = getConnection())
@@ -614,6 +630,20 @@ public class Database
         return appointments;
     }
 
+    public QueueTicket getQueueTicketById(int id)
+    {
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("SELECT * FROM queue_tickets WHERE id = ?");
+            ps.setInt(1, id);
+
+            var rs = ps.executeQuery();
+            if (rs.next()) { return QueueTicket.from(rs); }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return null;
+    }
+
     public QueueTicket joinQueue(User patient, int clinicServiceId)
     {
         return joinQueue(patient.getId(), clinicServiceId);
@@ -701,6 +731,24 @@ public class Database
         catch (SQLException e) { throw new RuntimeException(e); }
     }
 
+    public boolean updateQueueTicket(QueueTicket queueTicket)
+    {
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("UPDATE queue_tickets SET patient_id = ?, clinic_service_id = ?, queue_date = ?, queue_number = ?, status = ? WHERE id = ?");
+            ps.setInt(1, queueTicket.getPatientId());
+            ps.setInt(2, queueTicket.getClinicServiceId());
+            ps.setObject(3, queueTicket.getQueueDate());
+            ps.setInt(4, queueTicket.getQueueNumber());
+            ps.setString(5, queueTicket.getStatus().name());
+            ps.setInt(6, queueTicket.getId());
+
+            var affectedRows = ps.executeUpdate();
+            return (affectedRows > 0);
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+    }
+
     public List<QueueTicket> getQueueTicketsByPatient(User patient)
     {
         var appointments = new ArrayList<QueueTicket>();
@@ -715,5 +763,27 @@ public class Database
         }
         catch (SQLException e) { throw new RuntimeException(e); }
         return appointments;
+    }
+
+    public List<QueueTicket> getQueueTicketsByClinicAndDate(int clinicId, LocalDate date)
+    {
+        var queueTickets = new ArrayList<QueueTicket>();
+
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement(
+                    """
+                    SELECT queue_tickets.* FROM queue_tickets
+                        LEFT JOIN clinic_services ON queue_tickets.clinic_service_id = clinic_services.id
+                    WHERE clinic_id = ? AND queue_date = ?
+                    """);
+            ps.setInt(1, clinicId);
+            ps.setObject(2, date);
+
+            var rs = ps.executeQuery();
+            while (rs.next()) { queueTickets.add(QueueTicket.from(rs)); }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return queueTickets;
     }
 }
