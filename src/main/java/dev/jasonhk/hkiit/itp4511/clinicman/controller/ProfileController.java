@@ -25,6 +25,7 @@ public class ProfileController extends Controller
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
+        var password = request.getParameter("password");
         var gender = request.getParameter("gender");
         var dateOfBirth = request.getParameter("dateOfBirth");
 
@@ -35,7 +36,8 @@ public class ProfileController extends Controller
         user.setGender(((gender != null) && !gender.isBlank()) ? Gender.valueOf(gender) : null);
         user.setDateOfBirth(((dateOfBirth != null) && !dateOfBirth.isBlank()) ? LocalDate.parse(dateOfBirth) : null);
 
-        database.updateUser(user);
+        if (database.updateUser(user)) { setCurrentUser(request, user); }
+        if ((password != null) && !password.isEmpty()) { database.updateUserPassword(user, password); }
         doGet(request, response);
     }
 }

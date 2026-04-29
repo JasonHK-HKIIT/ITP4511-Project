@@ -75,6 +75,25 @@ public class Database
         catch (SQLException e) { throw new RuntimeException(e); }
     }
 
+    public boolean updateUserPassword(User user, String password)
+    {
+        return updateUserPassword(user.getId(), password);
+    }
+
+    public boolean updateUserPassword(int id, String password)
+    {
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("UPDATE users SET password = ? WHERE id = ?");
+            ps.setString(1, password);
+            ps.setInt(2, id);
+
+            var affectedRows = ps.executeUpdate();
+            return (affectedRows > 0);
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+    }
+
     public User getUserByCredentials(String username, String password)
     {
         try (var c = getConnection())

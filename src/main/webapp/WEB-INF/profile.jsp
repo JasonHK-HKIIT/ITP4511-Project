@@ -25,6 +25,13 @@
                     <input name="username" type="text" value="${user.username}" autocomplete="username" required />
                 </label>
                 <label>
+                    New Password
+                    <input name="password" type="password" autocomplete="new-password" />
+                </label>
+            </fieldset>
+
+            <fieldset>
+                <label>
                     Full Name
                     <input name="fullName" type="text" value="${user.fullName}" autocomplete="name" required />
                 </label>
