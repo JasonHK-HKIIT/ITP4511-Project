@@ -20,7 +20,7 @@
     <main class="container">
         <h1>Register</h1>
 
-        <form action="/register" method="post">
+        <form method="post">
             <fieldset>
                 <label>
                     Username
@@ -44,7 +44,7 @@
                 <label>
                     Gender
                     <select name="gender">
-                        <option value="">Unspecified</option>
+                        <option value=""></option>
                         <option value="MALE">Male</option>
                         <option value="FEMALE">Female</option>
                     </select>

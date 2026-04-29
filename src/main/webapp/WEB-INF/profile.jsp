@@ -11,14 +11,12 @@
     <link rel="stylesheet" href="/css/pico.jade.min.css">
 </head>
 <body>
-    <jsp:include page="/WEB-INF/includes/header.jsp">
-        <jsp:param name="type" value="${user.role.name().toLowerCase()}" />
-    </jsp:include>
+    <jsp:include page="/WEB-INF/includes/header.jsp" />
 
     <main class="container">
         <h1>Profile</h1>
 
-        <form action="/profile" method="post">
+        <form method="post">
             <fieldset>
                 <label>
                     Username
@@ -42,7 +40,7 @@
                 <label>
                     Gender
                     <select name="gender">
-                        <option value="">Unspecified</option>
+                        <option value=""></option>
                         <option value="MALE"${(user.gender == 'MALE') ? ' selected' : ''}>Male</option>
                         <option value="FEMALE"${(user.gender == 'FEMALE') ? ' selected' : ''}>Female</option>
                     </select>

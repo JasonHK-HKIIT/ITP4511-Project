@@ -21,7 +21,12 @@
     <jsp:include page="/WEB-INF/includes/header.jsp" />
 
     <main class="container">
-        <h1>Users</h1>
+        <hgroup>
+            <h1>Users</h1>
+            <p>
+                <a href="/admin/users?action=create">[Create]</a>
+            </p>
+        </hgroup>
 
         <table>
             <thead>
