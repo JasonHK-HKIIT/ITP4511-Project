@@ -9,13 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.Appointment;
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.Clinic;
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.ClinicService;
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.QueueTicket;
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.Service;
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.Timeslot;
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.User;
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.*;
 
 public class Database
 {
@@ -786,4 +780,35 @@ public class Database
         catch (SQLException e) { throw new RuntimeException(e); }
         return queueTickets;
     }
+
+    public boolean createAppointmentNotification(Appointment appointment)
+    {
+        try (var c = getConnection())
+        {
+            Timeslot timeslot =  getTimeslotById(appointment.getTimeslotId());
+
+            var ps = c.prepareStatement("INSERT INTO notifications (user_id,type,title,message,related_appointment_id) VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, appointment.getPatientId());
+            if(appointment.getStatus() == AppointmentStatus.CONFIRMED){
+                ps.setString(2, "Confirmation");
+                ps.setString(3, "Appointment submitted at " + appointment.getBookedAt().toString() + " confrimed!");
+                ps.setString(4, "Please come on or before " + timeslot.getSlotDate() + " " + timeslot.getStartTime() + " ! We are happy to see you there!");
+                ps.setInt(5,appointment.getId());
+            }else if (appointment.getStatus() == AppointmentStatus.CANCELLED){
+                ps.setString(2, "Cancellation");
+                ps.setString(3, "Appointment submitted at " + appointment.getBookedAt().toString() + " is cancelled!");
+                ps.setString(4, "Your appointment is cancelled due to the following reason: " + appointment.getCancelReason() + " We are sorry for the inconvinence!");
+                ps.setInt(5,appointment.getId());
+            }else {return false;}
+
+
+
+
+            var affectedRows = ps.executeUpdate();
+            return (affectedRows > 0);
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+    }
+
+
 }

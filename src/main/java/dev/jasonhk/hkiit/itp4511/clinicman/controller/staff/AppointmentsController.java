@@ -76,7 +76,9 @@ public class AppointmentsController extends Controller
                 var appointment = database.getAppointmentById(id);
                 appointment.setStatus(AppointmentStatus.CONFIRMED);
 
-                database.updateAppointment(appointment);
+                if (database.updateAppointment(appointment))
+                    database.createAppointmentNotification(appointment);
+
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
             case "check-in" ->
@@ -111,6 +113,7 @@ public class AppointmentsController extends Controller
                 var id = Integer.parseInt(request.getParameter("id"));
                 var cancelReason = request.getParameter("cancelReason");
                 database.cancelAppointmentByStaff(id, ((cancelReason != null) && !cancelReason.isBlank()) ? cancelReason : null);
+                database.createAppointmentNotification(database.getAppointmentById(id));
 
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
