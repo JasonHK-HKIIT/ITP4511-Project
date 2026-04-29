@@ -217,7 +217,11 @@ CREATE UNIQUE INDEX uq_patient_timeslot ON appointments (patient_id, timeslot_id
 INSERT INTO appointments (patient_id, timeslot_id, status, approval_status, booked_at, cancel_reason)
 VALUES
     (3, 1, 'CONFIRMED', 'NOT_REQUIRED', NOW(), NULL),
-    (4, 124, 'PENDING', 'NOT_REQUIRED', NOW(), NULL)
+    (4, 124, 'PENDING', 'NOT_REQUIRED', NOW(), NULL),
+    (5, 25, 'NO_SHOW', 'NOT_REQUIRED', NOW(), NULL),
+    (5, 81, 'NO_SHOW', 'NOT_REQUIRED', NOW(), NULL),
+    (5, 89, 'NO_SHOW', 'NOT_REQUIRED', NOW(), NULL),
+    (5, 401, 'NO_SHOW', 'NOT_REQUIRED', NOW(), NULL)
 ON DUPLICATE KEY UPDATE
     status = VALUES(status),
     approval_status = VALUES(approval_status),
@@ -228,9 +232,13 @@ UPDATE timeslots
 SET booked_count = CASE
     WHEN id = 1 THEN 1
     WHEN id = 124 THEN 1
+    WHEN id = 25 THEN 1
+    WHEN id = 81 THEN 1
+    WHEN id = 89 THEN 1
+    WHEN id = 401 THEN 1
     ELSE booked_count
 END
-WHERE id IN (1, 124);
+WHERE id IN (1, 124, 25, 81, 89, 401);
 
 -- =========================
 -- 7. QUEUES

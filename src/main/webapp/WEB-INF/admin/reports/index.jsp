@@ -37,6 +37,12 @@
             <button type="submit">Search</button>
         </form>
     </section>
+
+    <section>
+        <h2>No-show Summary</h2>
+
+        <a href="/admin/reports?type=no-show" role="button">View Report</a>
+    </section>
 </main>
 </body>
 </html>
