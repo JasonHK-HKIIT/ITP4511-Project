@@ -12,7 +12,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Appointments Report</title>
+    <title>Appointment Records</title>
     <link rel="stylesheet" href="/css/pico.jade.min.css">
     <style>
         #appointments td:nth-child(3)
@@ -25,7 +25,7 @@
     <jsp:include page="/WEB-INF/includes/header.jsp" />
 
     <main class="container">
-        <h1>Appointments Report</h1>
+        <h1>Appointment Records</h1>
 
         <table>
             <thead>

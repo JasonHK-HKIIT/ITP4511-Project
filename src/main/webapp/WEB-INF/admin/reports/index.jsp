@@ -17,7 +17,7 @@
     <h1>Reports</h1>
 
     <section>
-        <h2>Appointments</h2>
+        <h2>Appointment Records</h2>
 
         <form method="get">
             <input name="type" type="hidden" value="appointments" />
