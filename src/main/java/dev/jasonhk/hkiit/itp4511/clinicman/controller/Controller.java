@@ -9,10 +9,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import dev.jasonhk.hkiit.itp4511.clinicman.Database;
-import dev.jasonhk.hkiit.itp4511.clinicman.mixin.WithDatabase;
 import dev.jasonhk.hkiit.itp4511.clinicman.mixin.WithUser;
 
-public class Controller extends HttpServlet implements WithDatabase, WithUser
+public class Controller extends HttpServlet implements WithUser
 {
     protected Database database;
 
@@ -20,7 +19,12 @@ public class Controller extends HttpServlet implements WithDatabase, WithUser
     public void init(ServletConfig config) throws ServletException
     {
         super.init(config);
-        database = getDatabase(config);
+        var context = config.getServletContext();
+
+        var url = context.getInitParameter("database_url");
+        var user = context.getInitParameter("database_user");
+        var password = context.getInitParameter("database_password");
+        database = new Database(url, user, password);
     }
 
     protected void showErrorPage(HttpServletRequest request, HttpServletResponse response, String message) throws ServletException, IOException
