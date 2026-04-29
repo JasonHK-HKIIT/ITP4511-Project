@@ -62,14 +62,6 @@ public class AppointmentsController extends Controller
         var action = Objects.requireNonNullElse(request.getParameter("action"), "list").toLowerCase();
         switch (action)
         {
-            case "book" ->
-            {
-                var user = getCurrentUser(request);
-                var timeslotId = Integer.parseInt(request.getParameter("timeslot"));
-                database.bookAppointment(user.getId(), timeslotId);
-
-                response.sendRedirect("/appointments");
-            }
             case "confirm" ->
             {
                 var id = Integer.parseInt(request.getParameter("id"));
