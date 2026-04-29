@@ -94,7 +94,7 @@
     <script type="module">
         import { initializeDialog } from "/js/dialog-helpers.js";
 
-        initializeDialog(document.querySelector("dialog[data-type=delete]"), "/appointments?action=delete&id={id}", () => location.reload());
+        initializeDialog(document.querySelector("dialog[data-type=delete]"), "/admin/users?action=delete&id={id}", () => location.reload());
     </script>
 </body>
 </html>

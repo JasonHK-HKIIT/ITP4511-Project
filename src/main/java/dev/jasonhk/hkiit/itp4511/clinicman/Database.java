@@ -158,6 +158,19 @@ public class Database
         catch (SQLException e) { throw new RuntimeException(e); }
     }
 
+    public boolean deleteUserById(int id)
+    {
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("DELETE FROM users WHERE id = ?");
+            ps.setInt(1, id);
+
+            var affectedRows = ps.executeUpdate();
+            return (affectedRows > 0);
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+    }
+
     public List<User> getUsers()
     {
         var users = new ArrayList<User>();
