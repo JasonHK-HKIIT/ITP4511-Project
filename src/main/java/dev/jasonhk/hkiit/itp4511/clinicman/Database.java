@@ -600,6 +600,25 @@ public class Database
         catch (SQLException e) { throw new RuntimeException(e); }
     }
 
+    public List<Appointment> getAppointments()
+    {
+        var appointments = new ArrayList<Appointment>();
+
+        try (var c = getConnection())
+        {
+            var s = c.createStatement();
+            var rs = s.executeQuery("""
+                    SELECT appointments.* FROM appointments
+                        LEFT JOIN timeslots ON appointments.timeslot_id = timeslots.id
+                    ORDER BY slot_date DESC, start_time
+                    """);
+
+            while (rs.next()) { appointments.add(Appointment.from(rs)); }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return appointments;
+    }
+
     public List<Appointment> getAppointmentsByPatient(User patient)
     {
         var appointments = new ArrayList<Appointment>();
