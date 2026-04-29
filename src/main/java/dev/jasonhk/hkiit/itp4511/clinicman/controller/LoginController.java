@@ -18,7 +18,7 @@ public class LoginController extends Controller
             return;
         }
 
-        request.getRequestDispatcher("WEB-INF/login.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
     }
 
     @Override

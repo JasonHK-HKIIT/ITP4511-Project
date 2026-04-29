@@ -55,19 +55,68 @@ public class Database
         return null;
     }
 
+    public User createUser(String username, String password, String fullName, String phone, Role role, Integer clinicId, Gender gender, LocalDate dateOfBirth)
+    {
+        try (var c = getConnection(false))
+        {
+            int id;
+            try (var ps = c.prepareStatement("INSERT INTO users (username, password, full_name, phone, role, clinic_id, gender, date_of_birth) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS))
+            {
+                ps.setString(1, username);
+                ps.setString(2, password);
+                ps.setString(3, fullName);
+                ps.setString(4, phone);
+                ps.setString(5, role.name());
+                ps.setObject(6, clinicId);
+                ps.setString(7, (gender != null) ? gender.name() : null);
+                ps.setObject(8, dateOfBirth);
+
+                ps.executeUpdate();
+                var rs = ps.getGeneratedKeys();
+                if (!rs.next()) { throw new IllegalStateException("No user was inserted"); }
+
+                id = rs.getInt(1);
+            }
+            catch (SQLException | IllegalStateException e)
+            {
+                c.rollback();
+                throw e;
+            }
+
+            try (var ps = c.prepareStatement("SELECT * FROM users WHERE id = ?"))
+            {
+                ps.setInt(1, id);
+
+                var rs = ps.executeQuery();
+                if (!rs.next()) { throw new IllegalStateException(String.format("Failed to query user #%d", id)); }
+
+                c.commit();
+                return User.from(rs);
+            }
+            catch (SQLException | IllegalStateException e)
+            {
+                c.rollback();
+                throw e;
+            }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+    }
+
     public boolean updateUser(User user)
     {
         try (var c = getConnection())
         {
             var gender = user.getGender();
 
-            var ps = c.prepareStatement("UPDATE users SET username = ?, full_name = ?, phone = ?, gender = ?, date_of_birth = ? WHERE id = ?");
+            var ps = c.prepareStatement("UPDATE users SET username = ?, full_name = ?, phone = ?, role = ?, clinic_id = ?, gender = ?, date_of_birth = ? WHERE id = ?");
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getFullName());
             ps.setString(3, user.getPhone());
-            ps.setString(4, (gender != null) ? gender.name() : null);
-            ps.setObject(5, user.getDateOfBirth());
-            ps.setInt(6, user.getId());
+            ps.setString(4, user.getRole().name());
+            ps.setObject(5, user.getClinicId());
+            ps.setString(6, (gender != null) ? gender.name() : null);
+            ps.setObject(7, user.getDateOfBirth());
+            ps.setInt(8, user.getId());
 
             var affectedRows = ps.executeUpdate();
             return (affectedRows > 0);
