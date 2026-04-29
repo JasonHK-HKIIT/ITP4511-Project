@@ -161,71 +161,31 @@ CREATE TABLE timeslots
     CONSTRAINT chk_timeslot_time CHECK (end_time > start_time)
 );
 
--- Seed timeslots for clinic 1 services (assumes clinic_service_id 1, 2, 3)
--- Dates: today and tomorrow; hourly windows: 09:00-13:00 and 14:00-18:00
+-- Seed timeslots for all clinic services
+-- Dates: today to next 7 days; hourly windows: 09:00-13:00 and 14:00-18:00
+-- Clinic 1: clinic_service_id 1-3 (4, 6, 2 capacity)
+-- Clinic 2: clinic_service_id 4-6 (4, 6, 2 capacity)
+-- Clinic 3: clinic_service_id 7-9 (4, 6, 2 capacity)
+-- Clinic 4: clinic_service_id 10-12 (4, 6, 2 capacity)
+-- Clinic 5: clinic_service_id 13-15 (4, 6, 2 capacity)
 INSERT INTO timeslots (clinic_service_id, slot_date, start_time, end_time, capacity, booked_count, status)
-VALUES
-    -- Today - clinic_service_id 1 (General Consultation, capacity 4)
-    (1, CURDATE(), '09:00:00', '10:00:00', 4, 0, 'OPEN'),
-    (1, CURDATE(), '10:00:00', '11:00:00', 4, 0, 'OPEN'),
-    (1, CURDATE(), '11:00:00', '12:00:00', 4, 0, 'OPEN'),
-    (1, CURDATE(), '12:00:00', '13:00:00', 4, 0, 'OPEN'),
-    (1, CURDATE(), '14:00:00', '15:00:00', 4, 0, 'OPEN'),
-    (1, CURDATE(), '15:00:00', '16:00:00', 4, 0, 'OPEN'),
-    (1, CURDATE(), '16:00:00', '17:00:00', 4, 0, 'OPEN'),
-    (1, CURDATE(), '17:00:00', '18:00:00', 4, 0, 'OPEN'),
-
-    -- Today - clinic_service_id 2 (Vaccination, capacity 6)
-    (2, CURDATE(), '09:00:00', '10:00:00', 6, 0, 'OPEN'),
-    (2, CURDATE(), '10:00:00', '11:00:00', 6, 0, 'OPEN'),
-    (2, CURDATE(), '11:00:00', '12:00:00', 6, 0, 'OPEN'),
-    (2, CURDATE(), '12:00:00', '13:00:00', 6, 0, 'OPEN'),
-    (2, CURDATE(), '14:00:00', '15:00:00', 6, 0, 'OPEN'),
-    (2, CURDATE(), '15:00:00', '16:00:00', 6, 0, 'OPEN'),
-    (2, CURDATE(), '16:00:00', '17:00:00', 6, 0, 'OPEN'),
-    (2, CURDATE(), '17:00:00', '18:00:00', 6, 0, 'OPEN'),
-
-    -- Today - clinic_service_id 3 (Basic Health Screening, capacity 2)
-    (3, CURDATE(), '09:00:00', '10:00:00', 2, 0, 'OPEN'),
-    (3, CURDATE(), '10:00:00', '11:00:00', 2, 0, 'OPEN'),
-    (3, CURDATE(), '11:00:00', '12:00:00', 2, 0, 'OPEN'),
-    (3, CURDATE(), '12:00:00', '13:00:00', 2, 0, 'OPEN'),
-    (3, CURDATE(), '14:00:00', '15:00:00', 2, 0, 'OPEN'),
-    (3, CURDATE(), '15:00:00', '16:00:00', 2, 0, 'OPEN'),
-    (3, CURDATE(), '16:00:00', '17:00:00', 2, 0, 'OPEN'),
-    (3, CURDATE(), '17:00:00', '18:00:00', 2, 0, 'OPEN'),
-
-    -- Tomorrow - clinic_service_id 1 (General Consultation, capacity 4)
-    (1, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '09:00:00', '10:00:00', 4, 0, 'OPEN'),
-    (1, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '10:00:00', '11:00:00', 4, 4, 'OPEN'),
-    (1, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '11:00:00', '12:00:00', 4, 0, 'OPEN'),
-    (1, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '12:00:00', '13:00:00', 4, 0, 'OPEN'),
-    (1, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '14:00:00', '15:00:00', 4, 0, 'OPEN'),
-    (1, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '15:00:00', '16:00:00', 4, 0, 'OPEN'),
-    (1, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '16:00:00', '17:00:00', 4, 0, 'OPEN'),
-    (1, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '17:00:00', '18:00:00', 4, 0, 'OPEN'),
-
-    -- Tomorrow - clinic_service_id 2 (Vaccination, capacity 6)
-    (2, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '09:00:00', '10:00:00', 6, 0, 'OPEN'),
-    (2, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '10:00:00', '11:00:00', 6, 0, 'OPEN'),
-    (2, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '11:00:00', '12:00:00', 6, 0, 'OPEN'),
-    (2, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '12:00:00', '13:00:00', 6, 0, 'OPEN'),
-    (2, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '14:00:00', '15:00:00', 6, 0, 'OPEN'),
-    (2, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '15:00:00', '16:00:00', 6, 0, 'OPEN'),
-    (2, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '16:00:00', '17:00:00', 6, 0, 'OPEN'),
-    (2, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '17:00:00', '18:00:00', 6, 0, 'OPEN'),
-
-    -- Tomorrow - clinic_service_id 3 (Basic Health Screening, capacity 2)
-    (3, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '09:00:00', '10:00:00', 2, 0, 'OPEN'),
-    (3, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '10:00:00', '11:00:00', 2, 0, 'OPEN'),
-    (3, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '11:00:00', '12:00:00', 2, 0, 'OPEN'),
-    (3, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '12:00:00', '13:00:00', 2, 0, 'OPEN'),
-    (3, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '14:00:00', '15:00:00', 2, 0, 'OPEN'),
-    (3, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '15:00:00', '16:00:00', 2, 0, 'OPEN'),
-    (3, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '16:00:00', '17:00:00', 2, 0, 'OPEN'),
-    (3, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '17:00:00', '18:00:00', 2, 0, 'OPEN')
+SELECT
+    cs.id,
+    DATE_ADD(CURDATE(), INTERVAL d.day_offset DAY) AS slot_date,
+    CASE WHEN h.hour < 13 THEN SEC_TO_TIME(h.hour * 3600) ELSE SEC_TO_TIME((h.hour - 1) * 3600) END AS start_time,
+    CASE WHEN h.hour < 13 THEN SEC_TO_TIME((h.hour + 1) * 3600) ELSE SEC_TO_TIME(h.hour * 3600) END AS end_time,
+    cs.slot_capacity,
+    0,
+    'OPEN'
+FROM
+    (SELECT 0 AS day_offset UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7) d,
+    (SELECT 9 AS hour UNION SELECT 10 UNION SELECT 11 UNION SELECT 12 UNION SELECT 14 UNION SELECT 15 UNION SELECT 16 UNION SELECT 17) h,
+    clinic_services cs
+WHERE
+    cs.id BETWEEN 1 AND 15
+    AND cs.status = 'ACTIVE'
 ON DUPLICATE KEY UPDATE
-    id = id;
+    booked_count = VALUES(booked_count);
 
 -- =========================
 -- 6. APPOINTMENTS
