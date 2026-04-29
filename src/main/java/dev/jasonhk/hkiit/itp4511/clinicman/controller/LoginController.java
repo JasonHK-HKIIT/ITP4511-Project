@@ -36,8 +36,8 @@ public class LoginController extends Controller
         var user = database.getUserByCredentials(username, password);
         if (user == null)
         {
-            request.setAttribute("isCredentialsError", true);
-            request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            showErrorPage(request, response, "Invalid Credentials", "The provided username or password is incorrect.", "Login");
             return;
         }
 

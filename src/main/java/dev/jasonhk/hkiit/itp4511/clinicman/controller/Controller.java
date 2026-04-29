@@ -23,6 +23,24 @@ public class Controller extends HttpServlet implements WithDatabase, WithUser
         database = getDatabase(config);
     }
 
+    protected void showErrorPage(HttpServletRequest request, HttpServletResponse response, String message) throws ServletException, IOException
+    {
+        showErrorPage(request, response, "Error", message);
+    }
+
+    protected void showErrorPage(HttpServletRequest request, HttpServletResponse response, String error, String message) throws ServletException, IOException
+    {
+        showErrorPage(request, response, error, message, error);
+    }
+
+    protected void showErrorPage(HttpServletRequest request, HttpServletResponse response, String error, String message, String title) throws ServletException, IOException
+    {
+        request.setAttribute("title", title);
+        request.setAttribute("error", error);
+        request.setAttribute("message", message);
+        request.getRequestDispatcher("/WEB-INF/error.jsp").forward(request, response);
+    }
+
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {

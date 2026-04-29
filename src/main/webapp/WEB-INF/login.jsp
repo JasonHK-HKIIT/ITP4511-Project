@@ -16,30 +16,23 @@
     </header>
 
     <main class="container">
-        <% if (request.getAttribute("isCredentialsError") != null) { %>
-            <h1>Error</h1>
+        <h1>Login</h1>
 
-            <p>Incorrect username or password.</p>
-            <a href="/login" role="button">Try Again</a>
-        <% } else { %>
-            <h1>Login</h1>
+        <form action="/login" method="post">
+            <fieldset>
+                <label>
+                    Username
+                    <input name="username" type="text" autocomplete="username" required />
+                </label>
+                <label>
+                    Password
+                    <input name="password" type="password" autocomplete="current-password" required />
+                </label>
+            </fieldset>
 
-            <form action="/login" method="post">
-                <fieldset>
-                    <label>
-                        Username
-                        <input name="username" type="text" autocomplete="username" required />
-                    </label>
-                    <label>
-                        Password
-                        <input name="password" type="password" autocomplete="current-password" required />
-                    </label>
-                </fieldset>
-
-                <button type="submit">Login</button>
-                <a href="/register" role="button" class="secondary" style="width: 100%">Register</a>
-            </form>
-        <% } %>
+            <button type="submit">Login</button>
+            <a href="/register" role="button" class="secondary" style="width: 100%">Register</a>
+        </form>
     </main>
 </body>
 </html>
