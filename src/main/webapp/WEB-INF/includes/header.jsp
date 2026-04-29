@@ -19,6 +19,10 @@
                     <li><a href="/staff/appointments">Appointments</a></li>
                     <li><a href="/staff/queues">Queues</a></li>
                 </c:when>
+                <c:when test="${user.role == 'ADMIN'}">
+                    <li><a href="/admin/reports">Reports</a></li>
+                    <li><a href="/admin/users">Users</a></li>
+                </c:when>
             </c:choose>
             <li><a href="/profile">Profile</a></li>
             <li><a href="/logout">Sign Out</a></li>

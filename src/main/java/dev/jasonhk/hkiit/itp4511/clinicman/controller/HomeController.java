@@ -18,17 +18,15 @@ public class HomeController extends Controller
         {
             case PATIENT ->
             {
-                request.setAttribute("user", user);
                 request.getRequestDispatcher("/WEB-INF/patient/home.jsp").forward(request, response);
             }
             case STAFF ->
             {
-                request.setAttribute("user", user);
                 request.getRequestDispatcher("/WEB-INF/staff/home.jsp").forward(request, response);
             }
             case ADMIN ->
             {
-
+                request.getRequestDispatcher("/WEB-INF/admin/home.jsp").forward(request, response);
             }
         }
     }
