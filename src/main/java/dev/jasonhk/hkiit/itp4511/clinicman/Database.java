@@ -55,6 +55,21 @@ public class Database
         return null;
     }
 
+    public User getUserByCredentials(String username, String password)
+    {
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("SELECT * FROM users WHERE username = ? AND password = ?");
+            ps.setString(1, username);
+            ps.setString(2, password);
+
+            var rs = ps.executeQuery();
+            if (rs.next()) { return User.from(rs); }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return null;
+    }
+
     public User createUser(String username, String password, String fullName, String phone, Role role, Integer clinicId, Gender gender, LocalDate dateOfBirth)
     {
         try (var c = getConnection(false))
@@ -141,21 +156,6 @@ public class Database
             return (affectedRows > 0);
         }
         catch (SQLException e) { throw new RuntimeException(e); }
-    }
-
-    public User getUserByCredentials(String username, String password)
-    {
-        try (var c = getConnection())
-        {
-            var ps = c.prepareStatement("SELECT * FROM users WHERE username = ? AND password = ?");
-            ps.setString(1, username);
-            ps.setString(2, password);
-
-            var rs = ps.executeQuery();
-            if (rs.next()) { return User.from(rs); }
-        }
-        catch (SQLException e) { throw new RuntimeException(e); }
-        return null;
     }
 
     public List<User> getUsers()
