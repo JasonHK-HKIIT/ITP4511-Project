@@ -6,15 +6,12 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.Clinic;
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.ClinicService;
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.Service;
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.Timeslot;
 import dev.jasonhk.hkiit.itp4511.clinicman.controller.Controller;
 
 @WebServlet("/appointments")
@@ -38,12 +35,14 @@ public class AppointmentsController extends Controller
                         .collect(Collectors.toMap(ClinicService::getId, Function.identity()));
                 var timeslots = database.getTimeslots().stream()
                         .collect(Collectors.toMap(Timeslot::getId, Function.identity()));
+                var today = LocalDate.now();
 
                 request.setAttribute("appointments", appointments);
                 request.setAttribute("clinics", clinics);
                 request.setAttribute("services", services);
                 request.setAttribute("clinicServices", clinicServices);
                 request.setAttribute("timeslots", timeslots);
+                request.setAttribute("today", today);
                 request.getRequestDispatcher("/WEB-INF/patient/appointments/list.jsp").forward(request, response);
             }
             case "book" ->
@@ -113,6 +112,10 @@ public class AppointmentsController extends Controller
                 var id = Integer.parseInt(request.getParameter("id"));
                 var timeslotId = Integer.parseInt(request.getParameter("timeslot"));
                 database.rescheduleAppointmentByPatient(id, timeslotId, user);
+
+                var appointment = database.getAppointmentById(id);
+                appointment.setStatus(AppointmentStatus.PENDING);
+                database.updateAppointment(appointment);
 
                 response.sendRedirect("/appointments");
             }

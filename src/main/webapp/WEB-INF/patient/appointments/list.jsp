@@ -7,6 +7,7 @@
 <jsp:useBean id="services" scope="request" type="java.util.Map<java.lang.Integer, dev.jasonhk.hkiit.itp4511.clinicman.bean.Service>" />
 <jsp:useBean id="clinicServices" scope="request" type="java.util.Map<java.lang.Integer, dev.jasonhk.hkiit.itp4511.clinicman.bean.ClinicService>" />
 <jsp:useBean id="timeslots" scope="request" type="java.util.Map<java.lang.Integer, dev.jasonhk.hkiit.itp4511.clinicman.bean.Timeslot>" />
+<jsp:useBean id="today" scope="request" type="java.time.LocalDate" />
 
 <!DOCTYPE html>
 <html>
@@ -64,20 +65,22 @@
                             </c:choose>
                         </td>
                         <td>
-                            <c:if test="${(appointment.status == 'PENDING') || (appointment.status == 'CONFIRMED')}">
-                                <c:url value="/appointments" var="rescheduleAppointment">
-                                    <c:param name="action" value="reschedule" />
-                                    <c:param name="id" value="${appointment.id}" />
-                                </c:url>
-                                <a href="${rescheduleAppointment}">[Reschedule]</a>
-                                <a href data-action="cancel" data-id="${appointment.id}"
-                                   data-date="${timeslot.slotDate}"
-                                   data-time="${timeslot.startTime}"
-                                   data-location="${clinics.get(clinicService.clinicId).location}"
-                                   data-service="${services.get(clinicService.serviceId).name}"
-                                >
-                                    [Cancel]
-                                </a>
+                            <c:if test="${timeslot.slotDate.isAfter(today)}">
+                                <c:if test="${(appointment.status == 'PENDING') || (appointment.status == 'CONFIRMED')}">
+                                    <c:url value="/appointments" var="rescheduleAppointment">
+                                        <c:param name="action" value="reschedule" />
+                                        <c:param name="id" value="${appointment.id}" />
+                                    </c:url>
+                                    <a href="${rescheduleAppointment}">[Reschedule]</a>
+                                    <a href data-action="cancel" data-id="${appointment.id}"
+                                       data-date="${timeslot.slotDate}"
+                                       data-time="${timeslot.startTime}"
+                                       data-location="${clinics.get(clinicService.clinicId).location}"
+                                       data-service="${services.get(clinicService.serviceId).name}"
+                                    >
+                                        [Cancel]
+                                    </a>
+                                </c:if>
                             </c:if>
                         </td>
                     </tr>
