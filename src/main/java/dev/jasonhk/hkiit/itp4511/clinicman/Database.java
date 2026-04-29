@@ -178,7 +178,7 @@ public class Database
         try (var c = getConnection())
         {
             var s = c.createStatement();
-            var rs = s.executeQuery("SELECT * FROM users");
+            var rs = s.executeQuery("SELECT * FROM users ORDER BY username");
             while (rs.next()) { users.add(User.from(rs)); }
         }
         catch (SQLException e) { throw new RuntimeException(e); }
