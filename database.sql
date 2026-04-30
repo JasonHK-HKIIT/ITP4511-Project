@@ -342,3 +342,97 @@ CREATE TABLE policy_settings
 -- Optional: avoid duplicate policy definitions for same scope
 CREATE UNIQUE INDEX uq_policy_scope
     ON policy_settings (policy_name, clinic_id, service_id);
+
+-- =========================
+-- 11. audit log and triggers
+-- =========================
+
+CREATE TABLE `audit_log` (
+  `tbl_name` varchar(20) NOT NULL,
+  `relevant_id` int(11) NOT NULL,
+  `old_row_data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`old_row_data`)),
+  `new_row_data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`new_row_data`)),
+  `dml_type` enum('INSERT','UPDATE','DELETE') NOT NULL,
+  `dml_timestamp` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `staff_id_stamp` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TRIGGER `appointment_update_audit_trigger` AFTER UPDATE ON `appointments`
+ FOR EACH ROW INSERT INTO audit_log (
+        tbl_name,
+        relevant_id,
+        old_row_data,
+        new_row_data,
+        dml_type,
+        dml_timestamp,
+        staff_id_stamp
+    )
+    VALUES(
+        "appointments",
+        NEW.id,
+        JSON_OBJECT(
+            "id", OLD.id,
+            "patient_id", OLD.patient_id,
+            "status", OLD.status,
+            "approval_status", OLD.approval_status,
+            "booked_at", OLD.booked_at,
+            "cancel_reason", OLD.cancel_reason
+        ),
+        JSON_OBJECT(
+            "id", NEW.id,
+            "patient_id", NEW.patient_id,
+            "status", NEW.status,
+            "approval_status", NEW.approval_status,
+            "booked_at", NEW.booked_at,
+            "cancel_reason", NEW.cancel_reason
+        ),
+        'UPDATE',
+        CURRENT_TIMESTAMP,
+        null
+        
+    );
+
+CREATE TRIGGER `queue_ticket_update_audit_trigger` AFTER UPDATE ON `queue_tickets`
+ FOR EACH ROW INSERT INTO audit_log (
+        tbl_name,
+        relevant_id,
+        old_row_data,
+        new_row_data,
+        dml_type,
+        dml_timestamp,
+        staff_id_stamp
+    )
+VALUES(
+        "queue_tickets",
+        NEW.id,
+        JSON_OBJECT(
+            "id", OLD.id,
+            "patient_id", OLD.patient_id,
+            "clinic_service_id", OLD.clinic_service_id,
+            "queue_date", OLD.queue_date,
+            "queue_number", OLD.queue_number,
+            "status", OLD.status,
+            "estimated_wait_minutes", OLD.estimated_wait_minutes,
+            "joined_at", OLD.joined_at,
+            "called_at", OLD.called_at,
+            "served_at", OLD.served_at
+        ),
+        JSON_OBJECT(
+            "id", NEW.id,
+            "patient_id", NEW.patient_id,
+            "clinic_service_id", NEW.clinic_service_id,
+            "queue_date", NEW.queue_date,
+            "queue_number", NEW.queue_number,
+            "status", NEW.status,
+            "estimated_wait_minutes", NEW.estimated_wait_minutes,
+            "joined_at", NEW.joined_at,
+            "called_at", NEW.called_at,
+            "served_at", NEW.served_at
+        ),
+        'UPDATE',
+        CURRENT_TIMESTAMP,
+        null
+
+        
+    );
+
