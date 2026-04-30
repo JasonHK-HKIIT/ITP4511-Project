@@ -64,7 +64,7 @@ public class QueuesController extends Controller
                 var user = getCurrentUser(request);
                 var id = Integer.parseInt(request.getParameter("id"));
                 database.leaveQueueByPatient(id, user);
-
+                database.stampLogAction(getCurrentUser(request),"queue_tickets",id);
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
             default -> response.sendError(HttpServletResponse.SC_BAD_REQUEST, String.format("Action %s is not supported", action));

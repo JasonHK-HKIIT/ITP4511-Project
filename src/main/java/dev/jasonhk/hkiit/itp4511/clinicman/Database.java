@@ -979,4 +979,41 @@ public class Database
         }
         catch (SQLException e) { throw new RuntimeException(e); }
     }
+
+
+    public boolean stampLogAction(User user, String table, int id){
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("UPDATE audit_log SET staff_id_stamp = ? WHERE tbl_name = ?  AND relevant_id = ?", Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, user.getId());
+            ps.setString(2,table);
+            ps.setInt(3,id);
+            var affectedRows = ps.executeUpdate();
+            return (affectedRows > 0);
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+    }
+
+
+
+    public ArrayList<StaffLog> getStaffLog() {
+        var logs = new ArrayList<StaffLog>();
+
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement(
+                    """
+                    SELECT audit_log.* ,username FROM audit_log
+                        LEFT JOIN users ON users.id = audit_log.staff_id_stamp	
+                    WHERE users.role = "STAFF"
+                    """);
+
+            var rs = ps.executeQuery();
+            while (rs.next()) { logs.add(0,StaffLog.from(rs)); }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return logs;
+
+
+    }
 }

@@ -61,7 +61,8 @@ public class QueuesController extends Controller
                 queueTicket.setStatus(QueueTicketStatus.CALLED);
 
                 database.updateQueueTicket(queueTicket);
-                //database.createQueueTicketNotification(queueTicket);
+                database.createQueueTicketNotification(queueTicket);
+                database.stampLogAction(getCurrentUser(request),"queue_tickets",id);
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
             case "complete" ->
@@ -71,7 +72,8 @@ public class QueuesController extends Controller
                 queueTicket.setStatus(QueueTicketStatus.COMPLETED);
 
                 database.updateQueueTicket(queueTicket);
-                //database.removeNotificationOnUpdate(queueTicket);
+                database.removeNotificationOnUpdate(queueTicket);
+                database.stampLogAction(getCurrentUser(request),"queue_tickets",id);
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
             case "skip" ->
@@ -81,8 +83,9 @@ public class QueuesController extends Controller
                 queueTicket.setStatus(QueueTicketStatus.SKIPPED);
 
                 database.updateQueueTicket(queueTicket);
-                //database.removeNotificationOnUpdate(queueTicket);
-                //database.createQueueTicketNotification(queueTicket);
+                database.removeNotificationOnUpdate(queueTicket);
+                database.createQueueTicketNotification(queueTicket);
+                database.stampLogAction(getCurrentUser(request),"queue_tickets",id);
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
             default -> response.sendError(HttpServletResponse.SC_BAD_REQUEST, String.format("Action %s is not supported", action));

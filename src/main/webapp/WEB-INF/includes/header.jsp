@@ -21,6 +21,7 @@
                 </c:when>
                 <c:when test="${user.role == 'ADMIN'}">
                     <li><a href="/admin/reports">Reports</a></li>
+                    <li><a href="/admin/staffLog">Staff Action</a></li>
                     <li><a href="/admin/users">Users</a></li>
                 </c:when>
             </c:choose>

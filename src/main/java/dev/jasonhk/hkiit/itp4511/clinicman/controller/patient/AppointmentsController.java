@@ -112,10 +112,13 @@ public class AppointmentsController extends Controller
                 var id = Integer.parseInt(request.getParameter("id"));
                 var timeslotId = Integer.parseInt(request.getParameter("timeslot"));
                 database.rescheduleAppointmentByPatient(id, timeslotId, user);
-
                 var appointment = database.getAppointmentById(id);
                 appointment.setStatus(AppointmentStatus.PENDING);
                 database.updateAppointment(appointment);
+
+                database.stampLogAction(getCurrentUser(request),"appointments",appointment.getId());
+
+
 
                 response.sendRedirect("/appointments");
             }
@@ -124,7 +127,7 @@ public class AppointmentsController extends Controller
                 var user = getCurrentUser(request);
                 var id = Integer.parseInt(request.getParameter("id"));
                 database.cancelAppointmentByPatient(id, user);
-
+                database.stampLogAction(getCurrentUser(request),"appointments",id);
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
             default -> response.sendError(HttpServletResponse.SC_BAD_REQUEST, String.format("Action %s is not supported", action));

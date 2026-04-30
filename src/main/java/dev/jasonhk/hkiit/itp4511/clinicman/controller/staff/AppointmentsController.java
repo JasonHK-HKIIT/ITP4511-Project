@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import dev.jasonhk.hkiit.itp4511.clinicman.bean.AppointmentStatus;
-import dev.jasonhk.hkiit.itp4511.clinicman.bean.Clinic;
 import dev.jasonhk.hkiit.itp4511.clinicman.bean.ClinicService;
 import dev.jasonhk.hkiit.itp4511.clinicman.bean.Service;
 import dev.jasonhk.hkiit.itp4511.clinicman.bean.Timeslot;
@@ -70,6 +69,7 @@ public class AppointmentsController extends Controller
 
                 if (database.updateAppointment(appointment))
                     database.createAppointmentNotification(appointment);
+                database.stampLogAction(getCurrentUser(request),"appointments",id);
 
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
@@ -81,6 +81,7 @@ public class AppointmentsController extends Controller
 
                 database.updateAppointment(appointment);
                 database.removeNotificationOnUpdate(appointment);
+                database.stampLogAction(getCurrentUser(request),"appointments",appointment.getId());
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
             case "complete" ->
@@ -90,7 +91,8 @@ public class AppointmentsController extends Controller
                 appointment.setStatus(AppointmentStatus.COMPLETED);
 
                 database.updateAppointment(appointment);
-
+                database.stampLogAction(getCurrentUser(request),"appointments",id);
+                database.stampLogAction(getCurrentUser(request),"appointments",appointment.getId());
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
             case "no-show" ->
@@ -101,6 +103,7 @@ public class AppointmentsController extends Controller
 
                 database.updateAppointment(appointment);
                 database.removeNotificationOnUpdate(appointment);
+                database.stampLogAction(getCurrentUser(request),"appointments",appointment.getId());
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
             case "cancel" ->
@@ -110,7 +113,7 @@ public class AppointmentsController extends Controller
                 database.cancelAppointmentByStaff(id, ((cancelReason != null) && !cancelReason.isBlank()) ? cancelReason : null);
                 database.removeNotificationOnUpdate(database.getAppointmentById(id));
                 database.createAppointmentNotification(database.getAppointmentById(id));
-
+                database.stampLogAction(getCurrentUser(request),"appointments",id);
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
             default -> response.sendError(HttpServletResponse.SC_BAD_REQUEST, String.format("Action %s is not supported", action));
