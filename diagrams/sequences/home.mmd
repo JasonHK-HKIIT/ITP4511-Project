@@ -1,0 +1,22 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Browser
+    participant Controller as HomeController
+    participant DB as Database
+    participant View as JSP
+
+    User->>Browser: Open /
+    Browser->>Controller: GET /index.jsp
+    Controller->>Controller: Read current user role
+
+    alt Patient
+        Controller->>DB: getNotificationsByID(user.id)
+        DB-->>Controller: Notification list
+        Controller->>View: Forward /WEB-INF/patient/home.jsp
+    else Staff
+        Controller->>View: Forward /WEB-INF/staff/home.jsp
+    else Admin
+        Controller->>View: Forward /WEB-INF/admin/home.jsp
+    end
+    View-->>Browser: Render role-specific home page

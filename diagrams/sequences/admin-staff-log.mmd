@@ -1,0 +1,13 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Browser
+    participant Controller as staffLogController
+    participant DB as Database
+    participant View as JSP
+
+    User->>Browser: Open /admin/staffLog
+    Browser->>Controller: GET /admin/staffLog
+    Controller->>DB: getStaffLog()
+    Controller->>View: Forward /WEB-INF/admin/staffLog.jsp
+    View-->>Browser: Staff log table

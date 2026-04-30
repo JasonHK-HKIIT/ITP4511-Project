@@ -1,0 +1,11 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Browser
+    participant Controller as LogoutController
+    participant Session as Session
+
+    User->>Browser: Open /logout
+    Browser->>Controller: GET /logout
+    Controller->>Session: setCurrentUser(null)
+    Controller-->>Browser: Redirect /login

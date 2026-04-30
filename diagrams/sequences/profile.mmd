@@ -1,0 +1,28 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Browser
+    participant Controller as ProfileController
+    participant DB as Database
+    participant Session as Session
+    participant View as JSP
+
+    User->>Browser: Open /profile
+    Browser->>Controller: GET /profile
+    Controller->>Session: Read current user
+    Controller->>DB: getUserById(user.id)
+    DB-->>Controller: Fresh profile data
+    Controller->>View: Forward /WEB-INF/profile.jsp
+    View-->>Browser: Profile form
+
+    User->>Browser: Save profile changes
+    Browser->>Controller: POST /profile
+    Controller->>Session: Read current user
+    Controller->>DB: getUserById(user.id)
+    Controller->>DB: updateUser(user)
+    alt Password provided
+        Controller->>DB: updateUserPassword(user, password)
+    end
+    Controller->>Controller: Re-run GET flow
+    Controller->>View: Forward /WEB-INF/profile.jsp
+    View-->>Browser: Updated profile page

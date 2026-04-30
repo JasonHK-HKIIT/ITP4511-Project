@@ -1,0 +1,34 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Browser
+    participant Controller as LoginController
+    participant DB as Database
+    participant Session as Session
+    participant View as JSP
+
+    User->>Browser: Open /login
+    Browser->>Controller: GET /login
+    Controller->>Session: Check current user
+    alt Already signed in
+        Controller-->>Browser: Redirect /
+    else Guest
+        Controller->>View: Forward /WEB-INF/login.jsp
+        View-->>Browser: Login form
+    end
+
+    User->>Browser: Submit username and password
+    Browser->>Controller: POST /login
+    Controller->>Session: Check current user
+    alt Already signed in
+        Controller-->>Browser: Redirect /
+    else Guest
+        Controller->>DB: getUserByCredentials(username, password)
+        alt Invalid credentials
+            Controller->>View: Show /WEB-INF/error.jsp
+            View-->>Browser: 401 error page
+        else Valid credentials
+            Controller->>Session: setCurrentUser(user)
+            Controller-->>Browser: Redirect /
+        end
+    end

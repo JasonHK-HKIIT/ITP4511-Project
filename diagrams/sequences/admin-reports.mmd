@@ -1,0 +1,29 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Browser
+    participant Controller as ReportsController
+    participant DB as Database
+    participant SQL as Connection/SQL
+    participant View as JSP
+
+    User->>Browser: Open /admin/reports
+    Browser->>Controller: GET /admin/reports
+    Controller->>DB: getClinics()
+    Controller->>View: Forward /WEB-INF/admin/reports/index.jsp
+    View-->>Browser: Report selector
+
+    User->>Browser: View appointments report
+    Browser->>Controller: GET /admin/reports?type=appointments&clinicId=id
+    Controller->>DB: getAppointmentsByClinic(clinicId)
+    Controller->>DB: Load patients, clinics, services, clinicServices, timeslots
+    Controller->>View: Forward /WEB-INF/admin/reports/appointments.jsp
+    View-->>Browser: Appointment report
+
+    User->>Browser: View no-show report
+    Browser->>Controller: GET /admin/reports?type=no-show
+    Controller->>SQL: Run aggregation query
+    SQL-->>Controller: No-show counts
+    Controller->>DB: Load clinics, services, clinicServices
+    Controller->>View: Forward /WEB-INF/admin/reports/no-show.jsp
+    View-->>Browser: No-show report

@@ -1,0 +1,15 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Browser
+    participant Controller as ClinicsController
+    participant DB as Database
+    participant View as JSP
+
+    User->>Browser: Open /clinics
+    Browser->>Controller: GET /clinics
+    Controller->>DB: getClinics()
+    Controller->>DB: getClinicServices()
+    Controller->>DB: getServices()
+    Controller->>View: Forward /WEB-INF/patient/clinics.jsp
+    View-->>Browser: Clinics and services list

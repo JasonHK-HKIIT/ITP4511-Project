@@ -1,0 +1,36 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Browser
+    participant Controller as StaffAppointmentsController
+    participant DB as Database
+    participant View as JSP
+
+    User->>Browser: Open /staff/appointments
+    Browser->>Controller: GET /staff/appointments?action=list
+    Controller->>DB: getAppointmentsByClinic(user.clinicId)
+    Controller->>DB: Load patients, services, clinicServices, timeslots
+    Controller->>View: Forward /WEB-INF/staff/appointments/list.jsp
+    View-->>Browser: Appointment management list
+
+    User->>Browser: Confirm appointment
+    Browser->>Controller: POST /staff/appointments?action=confirm
+    Controller->>DB: updateAppointment(status=CONFIRMED)
+    Controller->>DB: createAppointmentNotification(appointment)
+    Controller-->>Browser: 204 No Content
+
+    User->>Browser: Check in appointment
+    Browser->>Controller: POST /staff/appointments?action=check-in
+    Controller->>DB: updateAppointment(status=ARRIVED)
+    Controller->>DB: removeNotificationOnUpdate(appointment)
+    Controller-->>Browser: 204 No Content
+
+    User->>Browser: Complete appointment
+    Browser->>Controller: POST /staff/appointments?action=complete
+    Controller->>DB: updateAppointment(status=COMPLETED)
+    Controller-->>Browser: 204 No Content
+
+    User->>Browser: Mark no-show or cancel
+    Browser->>Controller: POST /staff/appointments?action=no-show|cancel
+    Controller->>DB: Update status and notifications
+    Controller-->>Browser: 204 No Content

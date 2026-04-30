@@ -1,0 +1,125 @@
+erDiagram
+    CLINICS {
+        int id PK
+        varchar location
+        time opening_time
+        time closing_time
+        boolean is_walkin_enabled
+        enum status
+    }
+
+    USERS {
+        int id PK
+        varchar username
+        varchar password
+        varchar full_name
+        varchar phone
+        enum role
+        int clinic_id FK
+        enum gender
+        date date_of_birth
+    }
+
+    SERVICES {
+        int id PK
+        varchar name
+        int default_duration_minutes
+        enum status
+    }
+
+    CLINIC_SERVICES {
+        int id PK
+        int clinic_id FK
+        int service_id FK
+        int slot_capacity
+        int max_daily_bookings
+        enum status
+    }
+
+    TIMESLOTS {
+        int id PK
+        int clinic_service_id FK
+        date slot_date
+        time start_time
+        time end_time
+        int capacity
+        int booked_count
+        enum status
+    }
+
+    APPOINTMENTS {
+        int id PK
+        int patient_id FK
+        int timeslot_id FK
+        enum status
+        enum approval_status
+        datetime booked_at
+        varchar cancel_reason
+    }
+
+    QUEUES {
+        int id PK
+        int clinic_service_id FK
+        date queue_date
+        int last_queue_number
+    }
+
+    QUEUE_TICKETS {
+        int id PK
+        int patient_id FK
+        int clinic_service_id FK
+        date queue_date
+        int queue_number
+        enum status
+        int estimated_wait_minutes
+        datetime joined_at
+        datetime called_at
+        datetime served_at
+    }
+
+    NOTIFICATIONS {
+        int notification_id PK
+        int user_id FK
+        varchar type
+        varchar title
+        varchar message
+        int related_appointment_id FK
+        int related_queue_ticket_id FK
+    }
+
+    POLICY_SETTINGS {
+        int policy_id PK
+        varchar policy_name
+        varchar policy_value
+        varchar description
+        int clinic_id FK
+        int service_id FK
+        boolean is_active
+        int updated_by_user_id FK
+    }
+
+    AUDIT_LOG {
+        varchar tbl_name
+        int relevant_id
+        longtext old_row_data
+        longtext new_row_data
+        enum dml_type
+        timestamp dml_timestamp
+        int staff_id_stamp
+    }
+
+    CLINICS ||--o{ USERS : assigns
+    CLINICS ||--o{ CLINIC_SERVICES : offers
+    SERVICES ||--o{ CLINIC_SERVICES : defines
+    CLINIC_SERVICES ||--o{ TIMESLOTS : schedules
+    USERS ||--o{ APPOINTMENTS : books
+    TIMESLOTS ||--o{ APPOINTMENTS : contains
+    CLINIC_SERVICES ||--o{ QUEUES : tracks
+    USERS ||--o{ QUEUE_TICKETS : takes
+    CLINIC_SERVICES ||--o{ QUEUE_TICKETS : serves
+    USERS ||--o{ NOTIFICATIONS : receives
+    APPOINTMENTS ||--o{ NOTIFICATIONS : references
+    QUEUE_TICKETS ||--o{ NOTIFICATIONS : references
+    CLINICS ||--o{ POLICY_SETTINGS : scoped_to
+    SERVICES ||--o{ POLICY_SETTINGS : scoped_to
+    USERS ||--o{ POLICY_SETTINGS : updates

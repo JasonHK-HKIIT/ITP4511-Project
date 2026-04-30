@@ -1,0 +1,30 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Browser
+    participant Controller as RegisterController
+    participant DB as Database
+    participant Session as Session
+    participant View as JSP
+
+    User->>Browser: Open /register
+    Browser->>Controller: GET /register
+    Controller->>Session: Check current user
+    alt Already signed in
+        Controller-->>Browser: Redirect /
+    else Guest
+        Controller->>View: Forward /WEB-INF/register.jsp
+        View-->>Browser: Registration form
+    end
+
+    User->>Browser: Submit registration data
+    Browser->>Controller: POST /register
+    Controller->>Session: Check current user
+    alt Already signed in
+        Controller-->>Browser: Redirect /
+    else Guest
+        Controller->>DB: createUser(patient details)
+        DB-->>Controller: Created user
+        Controller->>Session: setCurrentUser(user)
+        Controller-->>Browser: Redirect /
+    end

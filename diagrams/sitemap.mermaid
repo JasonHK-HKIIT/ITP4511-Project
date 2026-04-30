@@ -1,0 +1,41 @@
+graph TD
+    ROOT["/ (root)"]
+
+    subgraph PATIENT["Patient"]
+        P_INDEX["/ (patient)"]
+        P_CLINICS["/clinics"]
+        P_APPOINTMENTS["/appointments"]
+        P_APPOINTMENTS --> P_APPT_LIST["/appointments?action=list"]
+        P_APPOINTMENTS --> P_APPT_BOOK["/appointments?action=book"]
+        P_APPOINTMENTS --> P_APPT_RESCH["/appointments?action=reschedule"]
+        P_APPOINTMENTS --> P_APPT_TIMESLOTS["/appointments?action=timeslots"]
+        P_QUEUES["/queues"]
+        P_QUEUES --> P_QUEUES_LIST["/queues?action=list"]
+    end
+
+    subgraph STAFF["Staff"]
+        S_INDEX["/ (staff)"]
+        S_APPOINTMENTS["/staff/appointments"]
+        S_APPOINTMENTS --> S_APPT_LIST["/staff/appointments?action=list"]
+        S_QUEUES["/staff/queues"]
+        S_QUEUES --> S_QUEUES_LIST["/staff/queues?action=list"]
+    end
+
+    subgraph ADMIN["Admin"]
+        A_INDEX["/ (admin)"]
+        A_STAFFLOG["/admin/staffLog"]
+        A_USERS["/admin/users"]
+        A_REPORTS["/admin/reports"]
+    end
+
+    subgraph SHARED["Shared / Public"]
+        LOGIN["/login"]
+        REGISTER["/register"]
+        LOGOUT["/logout"]
+        PROFILE["/profile"]
+    end
+
+    ROOT --> PATIENT
+    ROOT --> STAFF
+    ROOT --> ADMIN
+    ROOT --> SHARED

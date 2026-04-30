@@ -1,0 +1,43 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Browser
+    participant Controller as AppointmentsController
+    participant DB as Database
+    participant View as JSP
+
+    User->>Browser: Open /appointments
+    Browser->>Controller: GET /appointments?action=list
+    Controller->>DB: getAppointmentsByPatient(user)
+    Controller->>DB: Load clinics, services, clinicServices, timeslots
+    Controller->>View: Forward /WEB-INF/patient/appointments/list.jsp
+    View-->>Browser: Appointment list
+
+    User->>Browser: Start booking
+    Browser->>Controller: GET /appointments?action=book&service=id
+    Controller->>DB: getClinicServiceById(id)
+    Controller->>DB: getTimeslotsByClinicServiceAndDate(tomorrow)
+    Controller->>View: Forward /WEB-INF/patient/appointments/book.jsp
+    View-->>Browser: Booking form
+
+    User->>Browser: Submit new booking
+    Browser->>Controller: POST /appointments?action=book
+    Controller->>DB: bookAppointment(user.id, timeslotId)
+    Controller-->>Browser: Redirect /appointments
+
+    User->>Browser: Open reschedule view
+    Browser->>Controller: GET /appointments?action=reschedule&id=id
+    Controller->>DB: Load appointment, timeslot, clinic service, clinic, service, timeslots
+    Controller->>View: Forward /WEB-INF/patient/appointments/reschedule.jsp
+    View-->>Browser: Reschedule form
+
+    User->>Browser: Confirm reschedule
+    Browser->>Controller: POST /appointments?action=reschedule
+    Controller->>DB: rescheduleAppointmentByPatient(id, timeslotId, user)
+    Controller->>DB: updateAppointment(status=PENDING)
+    Controller-->>Browser: Redirect /appointments
+
+    User->>Browser: Cancel appointment
+    Browser->>Controller: POST /appointments?action=cancel
+    Controller->>DB: cancelAppointmentByPatient(id, user)
+    Controller-->>Browser: 204 No Content

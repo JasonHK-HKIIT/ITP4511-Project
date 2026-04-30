@@ -1,0 +1,33 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Browser
+    participant Controller as StaffQueuesController
+    participant DB as Database
+    participant View as JSP
+
+    User->>Browser: Open /staff/queues
+    Browser->>Controller: GET /staff/queues?action=list
+    Controller->>DB: getQueueTicketsByClinicAndDate(user.clinicId, today)
+    Controller->>DB: Load patients, services, clinicServices
+    Controller->>View: Forward /WEB-INF/staff/queues/list.jsp
+    View-->>Browser: Live queue view
+
+    User->>Browser: Call next patient
+    Browser->>Controller: POST /staff/queues?action=call
+    Controller->>DB: updateQueueTicket(status=CALLED)
+    Controller->>DB: createQueueTicketNotification(ticket)
+    Controller-->>Browser: 204 No Content
+
+    User->>Browser: Complete queue ticket
+    Browser->>Controller: POST /staff/queues?action=complete
+    Controller->>DB: updateQueueTicket(status=COMPLETED)
+    Controller->>DB: removeNotificationOnUpdate(ticket)
+    Controller-->>Browser: 204 No Content
+
+    User->>Browser: Skip queue ticket
+    Browser->>Controller: POST /staff/queues?action=skip
+    Controller->>DB: updateQueueTicket(status=SKIPPED)
+    Controller->>DB: removeNotificationOnUpdate(ticket)
+    Controller->>DB: createQueueTicketNotification(ticket)
+    Controller-->>Browser: 204 No Content

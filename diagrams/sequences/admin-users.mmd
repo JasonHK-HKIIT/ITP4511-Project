@@ -1,0 +1,43 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Browser
+    participant Controller as UsersController
+    participant DB as Database
+    participant View as JSP
+
+    User->>Browser: Open /admin/users
+    Browser->>Controller: GET /admin/users?action=list
+    Controller->>DB: getUsers()
+    Controller->>DB: getClinics()
+    Controller->>View: Forward /WEB-INF/admin/users/list.jsp
+    View-->>Browser: User list
+
+    User->>Browser: Open create form
+    Browser->>Controller: GET /admin/users?action=create
+    Controller->>DB: getClinics()
+    Controller->>View: Forward /WEB-INF/admin/users/create.jsp
+    View-->>Browser: Create form
+
+    User->>Browser: Open edit form
+    Browser->>Controller: GET /admin/users?action=edit&id=id
+    Controller->>DB: getUserById(id)
+    Controller->>DB: getClinics()
+    Controller->>View: Forward /WEB-INF/admin/users/edit.jsp
+    View-->>Browser: Edit form
+
+    User->>Browser: Create or update user
+    Browser->>Controller: POST /admin/users?action=create|edit
+    alt Create
+        Controller->>DB: createUser(...)
+        Controller-->>Browser: Redirect /admin/users
+    else Edit
+        Controller->>DB: updateUser(target)
+        Controller->>DB: updateUserPassword(target, password?)
+        Controller-->>Browser: Reload list/edit view
+    end
+
+    User->>Browser: Delete user
+    Browser->>Controller: POST /admin/users?action=delete
+    Controller->>DB: deleteUserById(id)
+    Controller-->>Browser: 204 No Content

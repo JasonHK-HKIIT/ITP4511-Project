@@ -1,0 +1,24 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Browser
+    participant Controller as QueuesController
+    participant DB as Database
+    participant View as JSP
+
+    User->>Browser: Open /queues
+    Browser->>Controller: GET /queues?action=list
+    Controller->>DB: getQueueTicketsByPatient(user)
+    Controller->>DB: Load clinics, services, clinicServices
+    Controller->>View: Forward /WEB-INF/patient/queues/list.jsp
+    View-->>Browser: Queue ticket list
+
+    User->>Browser: Join a queue
+    Browser->>Controller: POST /queues?action=join
+    Controller->>DB: joinQueue(user, serviceId)
+    Controller-->>Browser: 204 No Content
+
+    User->>Browser: Leave a queue
+    Browser->>Controller: POST /queues?action=leave
+    Controller->>DB: leaveQueueByPatient(id, user)
+    Controller-->>Browser: 204 No Content
