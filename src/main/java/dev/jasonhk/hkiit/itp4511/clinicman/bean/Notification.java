@@ -69,32 +69,38 @@ public class Notification {
         this.related_queue_ticket_id = related_queue_ticket_id;
     }
 
-    public Notification(int id, int user_id, String type, String title, String message, int related_appoitnment_id, int related_queue_ticket_id) {
-        this.id = id;
+    public Notification(int user_id, String type, String title, String message, int related_id) {
         this.user_id = user_id;
         this.type = type;
         this.title = title;
         this.message = message;
-        this.related_appoitnment_id = related_appoitnment_id;
-        this.related_queue_ticket_id = related_queue_ticket_id;
+        if (type.equals("APPOINTMENT"))
+            this.related_appoitnment_id = related_appoitnment_id;
+        else if (type.equals("QUEUE_TICKET"))
+            this.related_queue_ticket_id = related_queue_ticket_id;
+        else this.title = "warning,message wrong";
     }
 
     public static Notification from(ResultSet rs) throws SQLException
     {
-        int rai = rs.getInt("related_appointment_id");
-        if (rs.wasNull())
-            rai = -1;
-        int rqi = rs.getInt("related_appointment_id");
-        if (rs.wasNull())
-            rqi = -1;
+        String type = "APPOINTMENT";
+        int related_id = rs.getInt("related_appointment_id");
+            if (rs.wasNull()) {
+                type = "QUEUE_TICKET";
+                related_id = rs.getInt("related_queue_ticket_id");
+                if (rs.wasNull())
+                {
+                    related_id = -1;
+                    type = "error retriving type";
+                }
+            }
+
         return new Notification(
-                rs.getInt("id"),
                 rs.getInt("user_id"),
-                rs.getString("type"),
+                type,
                 rs.getString("title"),
                 rs.getString("message"),
-                rai,
-                rqi);
-    }
+                related_id);
+        }
 
 }

@@ -890,19 +890,43 @@ public class Database
             var ps = c.prepareStatement("INSERT INTO notifications (user_id,type,title,message,related_appointment_id) VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, appointment.getPatientId());
             if(appointment.getStatus() == AppointmentStatus.CONFIRMED){
-                ps.setString(2, "Confirmation");
+                ps.setString(2, "APPOINTMENT");
                 ps.setString(3, "Appointment submitted at " + appointment.getBookedAt().toString() + " confrimed!");
                 ps.setString(4, "Please come on or before " + timeslot.getSlotDate() + " " + timeslot.getStartTime() + " ! We are happy to see you there!");
                 ps.setInt(5,appointment.getId());
             }else if (appointment.getStatus() == AppointmentStatus.CANCELLED){
-                ps.setString(2, "Cancellation");
+                ps.setString(2, "APPOINTMENT");
                 ps.setString(3, "Appointment submitted at " + appointment.getBookedAt().toString() + " is cancelled!");
                 ps.setString(4, "Your appointment is cancelled due to the following reason: " + appointment.getCancelReason() + " We are sorry for the inconvinence!");
                 ps.setInt(5,appointment.getId());
             }else {return false;}
 
+            var affectedRows = ps.executeUpdate();
 
+            return (affectedRows > 0);
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+    }
 
+    public boolean createQueueTicketNotification(QueueTicket queueTicket)
+    {
+        try (var c = getConnection())
+        {
+            Timeslot timeslot =  getTimeslotById(queueTicket.getPatientId());
+
+            var ps = c.prepareStatement("INSERT INTO notifications (user_id,type,title,message,related_queue_ticket_id) VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, queueTicket.getPatientId());
+            if(queueTicket.getStatus() == QueueTicketStatus.SKIPPED){
+                ps.setString(2, "QUEUE_TICKET");
+                ps.setString(3, "Ticket submitted at " + queueTicket.getQueueDate().toString() + " was skipped!");
+                ps.setString(4, "Your number was skipped ! We are sorry for the inconvienice!");
+                ps.setInt(5,queueTicket.getId());
+            }else if (queueTicket.getStatus() == QueueTicketStatus.CALLED){
+                ps.setString(2, "QUEUE_TICKET");
+                ps.setString(3, "Appointment submitted at " + queueTicket.getQueueDate().toString() + " is called!");
+                ps.setString(4, "Your number "+ queueTicket.getQueueNumber() +" has been called ! Please get to the clinic as soon as possible.");
+                ps.setInt(5,queueTicket.getId());
+            }else {return false;}
 
             var affectedRows = ps.executeUpdate();
             return (affectedRows > 0);
@@ -911,4 +935,48 @@ public class Database
     }
 
 
+    public ArrayList<Notification> getNotificationsByID(int user_id) {
+
+        var notifications = new ArrayList<Notification>();
+
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement(
+                    """
+                    SELECT * FROM notifications
+                        
+                    WHERE user_id = ? 
+                    """);
+            ps.setInt(1, user_id);
+
+            var rs = ps.executeQuery();
+            while (rs.next()) { notifications.add(0,Notification.from(rs)); }
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+        return notifications;
+
+    }
+
+    public boolean removeNotificationOnUpdate(Appointment appointment){
+
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("DELETE FROM notifications WHERE related_appointment_id = ? ", Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, appointment.getId());
+            var affectedRows = ps.executeUpdate();
+            return (affectedRows > 0);
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+    }
+
+    public boolean removeNotificationOnUpdate(QueueTicket QueueTicket){
+        try (var c = getConnection())
+        {
+            var ps = c.prepareStatement("DELETE FROM notifications WHERE related_queue_ticket_id = ? ", Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, QueueTicket.getId());
+            var affectedRows = ps.executeUpdate();
+            return (affectedRows > 0);
+        }
+        catch (SQLException e) { throw new RuntimeException(e); }
+    }
 }

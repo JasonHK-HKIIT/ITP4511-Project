@@ -1,7 +1,9 @@
 package dev.jasonhk.hkiit.itp4511.clinicman.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
+import dev.jasonhk.hkiit.itp4511.clinicman.bean.Notification;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +20,8 @@ public class HomeController extends Controller
         {
             case PATIENT ->
             {
+                ArrayList<Notification> notificationList = database.getNotificationsByID(user.getId());
+                request.setAttribute("notifications",notificationList);
                 request.getRequestDispatcher("/WEB-INF/patient/home.jsp").forward(request, response);
             }
             case STAFF ->

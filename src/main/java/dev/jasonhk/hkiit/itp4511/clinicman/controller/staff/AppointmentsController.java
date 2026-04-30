@@ -80,6 +80,7 @@ public class AppointmentsController extends Controller
                 appointment.setStatus(AppointmentStatus.ARRIVED);
 
                 database.updateAppointment(appointment);
+                database.removeNotificationOnUpdate(appointment);
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
             case "complete" ->
@@ -89,6 +90,7 @@ public class AppointmentsController extends Controller
                 appointment.setStatus(AppointmentStatus.COMPLETED);
 
                 database.updateAppointment(appointment);
+
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
             case "no-show" ->
@@ -98,6 +100,7 @@ public class AppointmentsController extends Controller
                 appointment.setStatus(AppointmentStatus.NO_SHOW);
 
                 database.updateAppointment(appointment);
+                database.removeNotificationOnUpdate(appointment);
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
             case "cancel" ->
@@ -105,6 +108,7 @@ public class AppointmentsController extends Controller
                 var id = Integer.parseInt(request.getParameter("id"));
                 var cancelReason = request.getParameter("cancelReason");
                 database.cancelAppointmentByStaff(id, ((cancelReason != null) && !cancelReason.isBlank()) ? cancelReason : null);
+                database.removeNotificationOnUpdate(database.getAppointmentById(id));
                 database.createAppointmentNotification(database.getAppointmentById(id));
 
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);

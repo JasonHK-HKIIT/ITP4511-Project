@@ -3,6 +3,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <jsp:useBean id="user" scope="request" type="dev.jasonhk.hkiit.itp4511.clinicman.bean.User" />
+<jsp:useBean id="notifications" scope="request" type="java.util.List<dev.jasonhk.hkiit.itp4511.clinicman.bean.Notification>"/>
 
 <!DOCTYPE html>
 <html>
@@ -18,11 +19,14 @@
 
         <section>
             <h2>Notifications</h2>
+            <c:forEach items="${notifications}" var="notification">
             <article>
-                <header>Header</header>
-                Body
-                <footer>Footer</footer>
+                <header>${notification.title}</header>
+                ${notification.message}
+                <footer>${notification.type}</footer>
             </article>
+            </br>
+            </c:forEach>
         </section>
     </main>
 </body>
